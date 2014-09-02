@@ -25,6 +25,7 @@ Using infected's credentials is an important feature, as it lets us force the pa
 The reason to why i am suggesting this "invite players to team", is so any participant of a team can get notifications as to when the match starts. Invitations should have to be acceped by the team players, as i know there has been drama as of who plays with who, so letting one person "set" the team of another sounds like a bad idea
 
 
+
 Handling of matches
 -------------------
 
@@ -35,6 +36,7 @@ When the match has started, the site will show a button saying "Done" or somethi
 This automates a process that i have experienced as clumbsy at infected earlier.
 
 Aditionally, the compo hosts might have to trigger a game start, and can write some custom text(like server ip) that the teams will see once they have all accepted the game.
+
 
 
 Brackets
