@@ -34,14 +34,24 @@ class Site {
 			echo '</div>';
 				if(Session::isAuthenticated())
 				{
+					$user = Session::getCurrentUser();
 					echo '<div id="content">';
 				        echo '<div id="leftColumn">';
 				            echo '<div id="profileBox">';
 				            	echo '<div id="userProfilePic">';
-				                	echo '<img></img>';
+				            		//Get avatar data
+
+									$avatarFile = null;
+									
+									if ($profile->hasValidAvatar()) {
+										$avatarFile = $profile->getAvatar()->getThumbnail();
+									} else {
+										$avatarFile = AvatarHandler::getDefaultAvatar($profile);
+									}
+				                	echo '<img src="../api/' . $avatarFile . '"></img>';
 				                echo '</div>';
 				                echo '<div id="userName">';
-				                	echo '<p>Warbo "warb" Warbosen warbolomommelom</p>';
+				                	echo '<p>' . $user->getDisplayName() . '</p>';
 				                echo '</div>';
 				            echo '</div>';
 				            echo '<div id="teamBox">';
