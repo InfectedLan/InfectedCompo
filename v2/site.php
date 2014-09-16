@@ -17,6 +17,7 @@ class Site {
 			echo '<head>';
 				echo '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
 			    echo '<link rel="stylesheet" type="text/css" href="style/style.css">';
+			    echo '<script src="scripts/shared.js"></script>';
 
 			    echo '<title>' . $this->getTitle() . '</title>';
 
@@ -26,6 +27,11 @@ class Site {
 			echo '</head>';
 
 			echo '<body>';
+			echo '<div id="errorbox" class="error">';
+				echo '<div id="errorTitle">Feil</div>';
+				echo '<span id="errorMsg">Placeholder error message here...</span>';
+				echo '<div class="errorClose">Lukk</div>';
+			echo '</div>';
 				if(Session::isAuthenticated())
 				{
 					echo '<div id="content">';

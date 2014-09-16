@@ -289,4 +289,37 @@ body{
 		margin:auto;
 	}
 	
-	
+/* Error stuff */
+#errorbox {
+	width: 700px;
+	height: 40px;
+
+	display: none;
+	padding: 5px;
+	position: fixed;
+    top:0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    margin: auto;
+}
+.errorClose {
+	cursor: pointer;
+	right: 0px;
+	top: 0px;
+	position: absolute;
+	font-size: 25px;
+}
+.error {
+	background-color: rgb(255, 100, 100);
+	border: 2px solid;
+    border-radius: 10px;
+    border-color: rgb(179, 60, 60);
+}
+.info {
+	background-color: rgb(15, 139, 196);
+	border: 3px solid;
+    /* border-radius: 10px; */
+    border-color: rgb(15, 105, 168);
+}	
