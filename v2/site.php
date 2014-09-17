@@ -17,13 +17,15 @@ class Site {
 			echo '<head>';
 				echo '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
 			    echo '<link rel="stylesheet" type="text/css" href="style/style.css">';
-			    echo '<script src="scripts/shared.js"></script>';
 
 			    echo '<title>' . $this->getTitle() . '</title>';
 
 				echo '<script src="../api/scripts/jquery-1.11.1.min.js"></script>';
 			    echo '<link href="../api/style/jquery-ui-1.11.1.css" rel="stylesheet" type="text/css" />';
 				echo '<script src="../api/scripts/jquery-ui-1.11.1.min.js"></script>';
+
+				//Custom javascripts. This HAS to be included after jquery
+				echo '<script src="scripts/shared.js"></script>';
 			echo '</head>';
 
 			echo '<body>';
@@ -34,6 +36,7 @@ class Site {
 			echo '</div>';
 				if(Session::isAuthenticated())
 				{
+					echo '<script src="scripts/compo.js"></script>';
 					$user = Session::getCurrentUser();
 					echo '<div id="content">';
 				        echo '<div id="leftColumn">';
@@ -43,10 +46,10 @@ class Site {
 
 									$avatarFile = null;
 									
-									if ($profile->hasValidAvatar()) {
-										$avatarFile = $profile->getAvatar()->getThumbnail();
+									if ($user->hasValidAvatar()) {
+										$avatarFile = $user->getAvatar()->getThumbnail();
 									} else {
-										$avatarFile = AvatarHandler::getDefaultAvatar($profile);
+										$avatarFile = AvatarHandler::getDefaultAvatar($user);
 									}
 				                	echo '<img src="../api/' . $avatarFile . '"></img>';
 				                echo '</div>';
@@ -56,8 +59,7 @@ class Site {
 				            echo '</div>';
 				            echo '<div id="teamBox">';
 				                echo '<p style="position:absolute; left:20px; top:-45px;">Teams</p>';
-				                echo '<h1>wArp - CS:GO</h1>';
-								echo '<h1>wArp - LoL</h1>';
+				                echo '<h3>Laster inn...</h3>';
 				                echo '<p id="addTeam"><span style="font-size:20px; margin-top:-15px;">+</span> Add Team</p>';
 				            echo '</div>';
 				            echo '<div id="chatBox">';
@@ -65,14 +67,22 @@ class Site {
 				        echo '</div>';
 				        echo '<div id="rightColumn">';
 				            echo '<div id="banner">';
-				            	echo '<div class="gameType" style="width:100px;"><p>CS:GO</p></div>';
+				            	//WIP
+				            	/*echo '<div class="gameType" style="width:100px;"><p>CS:GO</p></div>';
 				                echo '<div class="gameType" style="width:70px;"><p>LoL</p></div>';
-				                echo '<div class="gameType selected" style="width:170px;"><p>Current Match</p></div>';
+				                echo '<div class="gameType selected" style="width:170px;"><p>Current Match</p></div>';*/
 				                echo '<div id="bannerFiller"></div>';
 				            echo '</div>';
 				            echo '<div id="mainContent">';
-				                echo 'placeholder';
-				                
+				                if( isset($_GET['page'] ) && $this->viewPage($_GET['page']) )	
+				                {
+				                	$pageContent = new PageContent();
+				                	$pageContent->render();
+				                }	
+				                else
+				                {
+				                	echo '<h1>Velkommen til infected compo!</h1>';
+				                }		                
 				            echo '</div>';
 				        echo '</div>';
 				    echo '</div>';
@@ -125,12 +135,13 @@ class Site {
 				include_once $filePath;
 			}
 		}
-			
+		/*
 		if (!$found) {
 			echo '<article>';
 				echo '<h1>Siden ble ikke funnet!</h1>';
 			echo '</article>';
-		}
+		}*/
+		return $found;
 	}
 }
 ?>
