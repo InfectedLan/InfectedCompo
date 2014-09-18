@@ -11,9 +11,38 @@ body{
 	color:#bbbbc0;
 	font-family:arial;
 }
-	
+
+input {
+	margin: 2px;
+	/*width: 100%;*/
+	min-height: 21px;
+	width: 150px;
+	color:#bbbbc0;
+
+	border: 1px solid rgb(15, 42, 59);
+
+	background: rgb(0, 22, 39);
+}
+
+ul {
+	float: center;
+	list-style: none;
+	padding: 0px;
+	margin: auto;
+	width: 80%;
+	margin-top: 10px;
+}
+
+#loginInput {
+
+}
+
+#loginbox i {
+	margin: 4px;
+}
+
 #loginbox {
-	width: 300px;
+	width: 200px;
 	height: 200px;
 	margin: auto;
 	overflow: auto;
@@ -323,8 +352,8 @@ body{
 }
 .error {
 	background-color: rgba(5, 32, 49, 0.9);
-	width: 500px;
-	height: 300px;
+	width: 300px;
+	height: 150px;
 	/*
 	border: 2px solid;
     border-radius: 10px;

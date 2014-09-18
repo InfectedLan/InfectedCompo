@@ -92,20 +92,21 @@ class Site {
 					echo '<div id="loginbox">';
 						echo '<script src="../api/scripts/login.js"></script>';
 						echo '<form class="login" method="post">';
-							echo '<li>';
-								echo '<input class="input" type="text" name="username" placeholder="Brukernavn">';
-							echo '</li>';
-							echo '<li>';
-								echo '<input class="input" name="password" type="password" placeholder="Passord">';
-							echo '</li>';
-							
-							echo '<li>';
-								echo '<input class="button" id="submit" name="submit" type="submit" value="Logg inn">';
-							echo '</li>';
-							echo '<li>';
-								echo '<i>Du bruker samme bruker på composiden og ticketsiden</i>';
-							echo '</li>';
+							echo '<ul>';
+								echo '<li>';
+									echo '<input class="input" type="text" name="username" placeholder="Brukernavn">';
+								echo '</li>';
+								echo '<li>';
+									echo '<input class="input" name="password" type="password" placeholder="Passord">';
+								echo '</li>';
+								
+								echo '<li>';
+									echo '<input class="button" id="submit" name="submit" type="submit" value="Logg inn">';
+								echo '</li>';
+							echo '</ul>';
 						echo '</form>';
+						echo '<br />';
+						echo '<i>Du bruker samme bruker på composiden og ticketsiden</i>';
 					echo '</div>';
 				}
 			echo '</body>';
