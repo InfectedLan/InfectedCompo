@@ -12,6 +12,10 @@ body{
 	font-family:arial;
 }
 
+table {
+	padding: 5px;
+}
+
 input {
 	margin: 2px;
 	/*width: 100%;*/
