@@ -4,6 +4,7 @@ require_once 'handlers/eventhandler.php';
 class PageContent {
 	public function render() {
 		$currEvent = EventHandler::getCurrentEvent();
+		echo '<script src="scripts/addTeam.js"> </script>';
 		echo "<h1>Lag team</h1>";
 		echo "<table>";
 			echo '<tr>';
@@ -34,7 +35,7 @@ class PageContent {
 							echo '<td>';
 								echo '<select id="compoSelect">';
 									$compos = CompoHandler::getComposForEvent($currEvent);
-									foreach ($compo as $compos) {
+									foreach ($compos as $compo) {
 										echo '<option value="' . $compo->getId() . '">' . $compo->getName() . '</option>';
 									}
 								echo '</select>';
