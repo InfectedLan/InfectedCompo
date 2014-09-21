@@ -39,6 +39,16 @@ class PageContent {
 										echo '<option value="' . $compo->getId() . '">' . $compo->getName() . '</option>';
 									}
 								echo '</select>';
+								//Output team sizes
+								echo '<script>';
+									echo 'var compoTeamSizes = [';
+									$a = false;
+									foreach ($compos as $compo) {
+										echo ($a == true ? ', ' : '') . $compo->getTeamSize();
+										$a = true;
+									}
+									echo '];';
+								echo '</script>';
 							echo '</td>';
 						echo '</tr>';
 						echo '<tr>';

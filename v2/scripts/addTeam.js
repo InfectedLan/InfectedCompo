@@ -2,10 +2,17 @@ $(document).ready(function(){
 	$('#inviteSearchBox').on('input', function(){
 		updateSearchField();
 	});
+	$('#compoSelect').change(function() {
+		compoTeamSize = compoTeamSizes[$("#compoSelect").selectedIndex]-1;
+		invitedUserId = [];
+		invitedUserNames = [];
+		updateInvitedList();
+	});
 });
 
 var invitedUserId = [];
 var invitedUserNames = [];
+var compoTeamSize = 4;
 
 function updateSearchField()
 {
@@ -37,15 +44,18 @@ function updateSearchField()
 function inviteUser(userId, displayName) {
 	$.getJSON('../api/json/canparticipateincompos.php?id=' + userId, function(data){
 		if(data.result == true) {
-			invitedUserId.push(userId);
-			invitedUserNames.push(displayName);
+			if(invitedUserId.length<compoTeamSize)
+			{
+				invitedUserId.push(userId);
+				invitedUserNames.push(displayName);
 
-			updateSearchField();
-			updateInvitedList();
-			array("woo");
+				updateSearchField();
+				updateInvitedList();
+			} else {
+				error("Laget ditt er fullt!");
+			}
 		} else {
 			error(data.message);
-			array("noo");
 		}
   	});
 }
@@ -63,12 +73,27 @@ function removeInvited(arrayIndex) {
 		updateInvitedList();
 	}
 }
-function isInvited(userId)
-{
+function isInvited(userId) {
 	for(var i = 0; i < invitedUserId.length; i++) {
 		if(invitedUserId[i] == userId) {
 			return true;
 		}
 	}
 	return false;
+}
+function registerClan() {
+	var clanName = $("#clanName").val();
+	var clanTag = $("#clanTag").val();
+	$.getJSON('../api/json/registerclan.php?name=' + encodeURIComponent(clanName) + "&tag=" + encodeURIComponent(clanTag) + "&compo=" + encodeURIComponent( $("#compoSelect").val() ), function(data){
+		if(data.result == true) {
+			for(var i = 0; i < invitedUserId.length; i++) {
+				$.getJSON('../api/json/invitetoclan.php?id=' + data.clanId + "&user=" + invitedUserId[i], function(data){
+
+				}
+			}
+			info("Clanen ble registrert!", function() {location.reload()});
+		} else {
+			error(data.message);
+		}
+  	});
 }
