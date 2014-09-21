@@ -81,17 +81,22 @@ function isInvited(userId) {
 	}
 	return false;
 }
+//Handle clan registration
+var invitedPeople = 0;
 function registerClan() {
+	$("#addClanButtonWrapper").html("<i>Jobber...</i>");
 	var clanName = $("#clanName").val();
 	var clanTag = $("#clanTag").val();
 	$.getJSON('../api/json/registerclan.php?name=' + encodeURIComponent(clanName) + "&tag=" + encodeURIComponent(clanTag) + "&compo=" + encodeURIComponent( $("#compoSelect").val() ), function(data){
 		if(data.result == true) {
 			for(var i = 0; i < invitedUserId.length; i++) {
 				$.getJSON('../api/json/invitetoclan.php?id=' + data.clanId + "&user=" + invitedUserId[i], function(data){
-
-				}
+					invitedPeople++;
+					if(invitedPeople==invitedUserId.length) {
+						info("Clanen ble registrert!", function() {window.location = "index.php"});
+					}
+				});
 			}
-			info("Clanen ble registrert!", function() {location.reload()});
 		} else {
 			error(data.message);
 		}

@@ -53,7 +53,9 @@ class PageContent {
 						echo '</tr>';
 						echo '<tr>';
 							echo '<td>';
-								echo '<input type="button" value="Lag klan!" onClick="registerClan()" />';
+								echo '<div id="addClanButtonWrapper">';
+									echo '<input type="button" value="Lag klan!" onClick="registerClan()" />';
+								echo '</div>';
 							echo '</td>';
 						echo '</tr>';
 					echo '</table>';
