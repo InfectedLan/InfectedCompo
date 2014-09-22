@@ -42,6 +42,17 @@ ul {
 	cursor: pointer;
 }
 
+h1 {
+	font-size: 26px;
+	display: inline;
+}
+
+h3 {
+	font-size: 17px;
+	display: inline;
+	font-weight: normal;
+}
+
 #loginInput {
 
 }
@@ -195,6 +206,7 @@ ul {
 		
 	#mainContent{
 		height:600px;	
+		padding: 3px;
 	}
 	
 	
