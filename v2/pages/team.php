@@ -22,12 +22,14 @@ class PageContent {
 			echo '<table>';
 				$members = $team->getMembers();
 				foreach ($members as $member) {
-					$canKick = ($member->getId() != $team->getChief()) && ($user->getId() == $team->getChief());
-					if($canKick) {
-						echo '' . $member->getDisplayName() . '<input type="button" value="Kick" onclick="kickUser(' . $member->getId() . ', ' . $team->getId() . ')" /><br />';
-					} else {
-						echo '' . $member->getDisplayName() . '<br />';
-					}
+					echo '<tr>';
+						$canKick = ($member->getId() != $team->getChief()) && ($user->getId() == $team->getChief());
+						if($canKick) {
+							echo '<td>' . $member->getDisplayName() . '</td><td><input type="button" value="Kick" onclick="kickUser(' . $member->getId() . ', ' . $team->getId() . ')" /></td>';
+						} else {
+							echo '<td>' . $member->getDisplayName() . '</td>';
+						}
+					echo '</tr>';
 				}
 			echo '</table>';
 
