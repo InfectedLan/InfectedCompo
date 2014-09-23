@@ -70,9 +70,9 @@ class Site {
 				        echo '<div id="rightColumn">';
 				            echo '<div id="banner">';
 				            	//WIP
-				            	/*echo '<div class="gameType" style="width:100px;"><p>CS:GO</p></div>';
-				                echo '<div class="gameType" style="width:70px;"><p>LoL</p></div>';
-				                echo '<div class="gameType selected" style="width:170px;"><p>Current Match</p></div>';*/
+				            	echo '<div id="gameBannerCsGo" class="gameType" style="width:100px;"><p>CS:GO</p></div>';
+				                echo '<div id="gameBannerLoL" class="gameType" style="width:70px;"><p>LoL</p></div>';
+				                //echo '<div class="gameType selected" style="width:170px;"><p>Current Match</p></div>';
 				                echo '<div id="bannerFiller"></div>';
 				            echo '</div>';
 				            echo '<div id="mainContent">';

@@ -7,6 +7,12 @@ $(document).ready(function() {
 	});
 	compoStatusUpdateId = setInterval(updateCompoStatus, 5000);
 	updateCompoStatus();
+	$("#gameBannerCsGo").click(function(e) { 
+		window.location = "index.php?page=compo&id=1";
+	});
+	$("#gameBannerLoL").click(function(e) { 
+		window.location = "index.php?page=compo&id=2";
+	});
 });
 function addTeam()
 {
