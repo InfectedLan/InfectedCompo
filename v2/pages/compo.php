@@ -10,7 +10,7 @@ class PageContent {
 			echo '<h1>' . $compo->getName() . '</h1>';
 			echo '<br />';
 			//Get list of teams
-			$teams = CompoHandler::getTeams($compo);
+			$teams = CompoHandler::getClans($compo);
 			echo '<h3>Kvalifiserte lag:</h3>';
 			echo '<ul>';
 			foreach($teams as $team) {
@@ -18,6 +18,14 @@ class PageContent {
 					echo '<li>' . $team->getName() . '</li>';
 				}
 			}
+			echo '</ul>';
+			echo '<h3>Ikke kvalifiserte/Lag under oppbygging:</h3>';
+			echo '<ul>';
+				foreach($teams as $team) {
+					if(!$team->isQualified($compo)) {
+						echo '<li>' . $team->getName() . '</li>';
+					}
+				}
 			echo '</ul>';
 		} else {
 			echo '<h1>Compoen finnes ikke!</h1>';
