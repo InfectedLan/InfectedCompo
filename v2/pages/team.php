@@ -17,7 +17,7 @@ class PageContent {
 			//echo '</center>';
 			if($team->getChief() == $user->getId()) {
 				if(count($members) != $compo->getTeamSize()) {
-					echo '<b>ADVARSEL: Laget er ikke fullt, og vil ikke være kvalifisert til compoen før det er fullt!</b>';
+					echo '<br /><b>ADVARSEL: Laget er ikke fullt, og vil ikke være kvalifisert til compoen før det er fullt!</b>';
 				}
 			}
 
