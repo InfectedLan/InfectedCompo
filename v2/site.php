@@ -58,7 +58,7 @@ class Site {
 				                echo '</div>';
 				            echo '</div>';
 				            echo '<div id="teamBox">';
-				                echo '<p style="position:absolute; left:20px; top:-45px;">Teams</p>';
+				                echo '<p style="position:absolute; top:-45px;">Teams</p>';
 				                echo '<div id="teamData">';
 				                	echo '<h3>Laster inn...</h3>';
 				                echo '</div>';
