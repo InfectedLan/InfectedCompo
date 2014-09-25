@@ -96,20 +96,24 @@ function registerClan() {
 		$("#addClanButtonWrapper").html("<i>Jobber...</i>");
 		var clanName = $("#clanName").val();
 		var clanTag = $("#clanTag").val();
-		$.getJSON('../api/json/registerclan.php?name=' + encodeURIComponent(clanName) + "&tag=" + encodeURIComponent(clanTag) + "&compo=" + encodeURIComponent( $("#compoSelect").val() ), function(data){
-			if(data.result == true) {
-				clanId = data.clanId;
-				for(var i = 0; i < invitedUserId.length; i++) {
-					$.getJSON('../api/json/invitetoclan.php?id=' + data.clanId + "&user=" + invitedUserId[i], function(data){
-						invitedPeople++;
-						if(invitedPeople==invitedUserId.length) {
-							info("Clanen ble registrert!", function() {window.location = "index.php?page=team&id=" + clanId});
-						}
-					});
+		if(clanName == "" || clanTag == "") {
+			error("Du må skrive clan name og tag!");
+		} else {
+			$.getJSON('../api/json/registerclan.php?name=' + encodeURIComponent(clanName) + "&tag=" + encodeURIComponent(clanTag) + "&compo=" + encodeURIComponent( $("#compoSelect").val() ), function(data){
+				if(data.result == true) {
+					clanId = data.clanId;
+					for(var i = 0; i < invitedUserId.length; i++) {
+						$.getJSON('../api/json/invitetoclan.php?id=' + data.clanId + "&user=" + invitedUserId[i], function(data){
+							invitedPeople++;
+							if(invitedPeople==invitedUserId.length) {
+								info("Clanen ble registrert!", function() {window.location = "index.php?page=team&id=" + clanId});
+							}
+						});
+					}
+				} else {
+					error(data.message);
 				}
-			} else {
-				error(data.message);
-			}
-	  	});
+		  	});
+		}
 	//}
 }

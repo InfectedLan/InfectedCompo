@@ -31,7 +31,7 @@ class Site {
 
 			echo '<body>';
 			echo '<div id="errorbox" class="error">';
-				echo '<div id="errorTitle">Feil</div>';
+				echo '<div id="errorTitle">Driftsmelding</div>';
 				echo '<span id="errorMsg">Placeholder error message here...</span>';
 				echo '<div class="errorClose">Lukk</div>';
 			echo '</div>';
@@ -39,6 +39,10 @@ class Site {
 				{
 					echo '<script src="scripts/compo.js"></script>';
 					$user = Session::getCurrentUser();
+					echo '<script>';
+						echo 'var myUserId = ' . $user->getId() . ';';
+						echo 'var currentPage = "' . htmlentities($_GET['page'], ENT_QUOTES, 'UTF-8') . '";';
+					echo '</script>';
 					echo '<div id="content">';
 				        echo '<div id="leftColumn">';
 				            echo '<div id="profileBox">';
@@ -71,11 +75,25 @@ class Site {
 				        echo '<div id="rightColumn">';
 				            echo '<div id="banner">';
 				            	//WIP
-				            	echo '<div id="gameBannerCsGo" class="gameType" style="width:100px;"><p>CS:GO</p></div>';
-				                echo '<div id="gameBannerLoL" class="gameType" style="width:70px;"><p>LoL</p></div>';
+					            if(!isset($_GET['page'])) {
+					            	echo '<div id="gameBannerCsGo" class="gameType" style="width:100px;"><p>CS:GO</p></div>';
+					                echo '<div id="gameBannerLoL" class="gameType" style="width:70px;"><p>LoL</p></div>';
+					            } else {
+					            	if($_GET['page']=="compo") {
+					            		echo '<div id="gameBannerCsGo" class="gameType' .  ($_GET['id'] == "1" ? ' selected' : ''). '" style="width:100px;"><p>CS:GO</p></div>';
+					                	echo '<div id="gameBannerLoL" class="gameType' .  ($_GET['id'] == "2" ? ' selected' : ''). '" style="width:70px;"><p>LoL</p></div>';
+					            	} else {
+					            		echo '<div id="gameBannerCsGo" class="gameType" style="width:100px;"><p>CS:GO</p></div>';
+					                	echo '<div id="gameBannerLoL" class="gameType" style="width:70px;"><p>LoL</p></div>';
+					            	}
+					            }
 				                $match = MatchHandler::getMatchForUser($user);
 				                if(isset($match)) {
-				                	echo '<div class="gameType selected" style="width:170px;"><p>Current Match</p></div>';	
+				                	if(isset($_GET['page']) && $_GET['page'] == "match") {
+				                		echo '<div id="gameBannerCurrentMatch" class="gameType selected" style="width:170px;"><p>Current Match</p></div>';	
+				                	} else {
+				                		echo '<div id="gameBannerCurrentMatch" class="gameType" style="width:170px;"><p>Current Match</p></div>';	
+				                	}
 				                	echo '<div id="bannerFiller"></div>';
 				                } else {
 				                	echo '<div id="bannerFiller2"></div>';

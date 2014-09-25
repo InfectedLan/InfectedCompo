@@ -65,6 +65,7 @@ class PageContent {
 					echo '<div id="searchResultsResultPane">';
 
 					echo '</div>';
+					echo '<br />';
 					echo '<h3>Invited players:</h3>';
 					echo '<div id="invidedPlayers">';
 

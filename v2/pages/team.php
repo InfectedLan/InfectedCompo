@@ -6,6 +6,7 @@ class PageContent {
 	public function render() {
 		$user = Session::getCurrentUser();
 		if(isset($_GET['id'])) {
+			echo '<script src="team.js"> </script>';
 			$team = ClanHandler::getClan($_GET['id']);
 			//echo '<center>';
 				echo '<h1>' . $team->getName() . ' - ' . $team->getTag() . '</h1>';
