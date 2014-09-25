@@ -53,7 +53,8 @@ ul {
 	list-style: none;
 	padding: 0px;
 	margin: auto;
-	width: 80%;
+	/* width: 80%; */
+	width: 95%;
 	margin-top: 10px;
 }
 

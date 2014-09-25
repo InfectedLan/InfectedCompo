@@ -19,11 +19,11 @@ class PageContent {
 					$numQualified++;
 				}
 			}
-			echo '<h3>Kvalifiserte lag:</h3>';
+			echo '<h3>Fullstendige lag:</h3>';
 			echo '<br />';
 			echo '<br />';
 			if($numQualified==0) {
-				echo '<i>Ingen lag er kvalifisert enda!</i>';
+				echo '<i>Ingen lag er fullstendige enda!</i>';
 			}
 			echo '<ul>';
 			//print_r($teams);
@@ -34,7 +34,7 @@ class PageContent {
 			}
 			echo '</ul>';
 			if(count($teams) != $numQualified) {
-				echo '<h3>Ikke kvalifiserte/Lag under oppbygging:</h3>';
+				echo '<h3>Ufullstendige lag:</h3>';
 				echo '<br />';
 				echo '<ul>';
 					foreach($teams as $clan) {
@@ -43,6 +43,8 @@ class PageContent {
 						}
 					}
 				echo '</ul>';
+				echo '<br />';
+				echo '<i>Disse lagene mangler spillere og vil ikke kunne delta med mindre de klarer å fylle laget</i>';
 			}
 			//Add JS
 			echo '<script>var compoTeamList = [';
