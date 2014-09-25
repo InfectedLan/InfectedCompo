@@ -8,7 +8,7 @@ class PageContent {
 		if(isset($_GET['id'])) {
 			$team = ClanHandler::getClan($_GET['id']);
 			//echo '<center>';
-				echo '<h1>' . $team->getTag() . ' ' . $team->getName() . '</h1>';
+				echo '<h1>' . $team->getName() . ' - ' . $team->getTag() . '</h1>';
 				echo '<br />';
 				$compo = ClanHandler::getCompo($team);
 				echo '<h3>' . $compo->getName() . '</h3>';

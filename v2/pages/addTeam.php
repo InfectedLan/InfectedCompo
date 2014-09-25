@@ -9,12 +9,10 @@ class PageContent {
 		echo "<table>";
 			echo '<tr>';
 				echo '<td width="50%">';
-					echo '<h3>Et par detaljer...</h3>';
-					echo '<p>Før du kan lage klanen må vi få vite litt mer om den. Vennligst fyll ut litt mer om den. Du kan for øyeblikket bare melde en klan på en compo. Lag flere dersom dere skal delta i flere kompoer.</p>';
 					echo '<table>';
 						echo '<tr>';
 							echo '<td>';
-								echo 'Navn:';
+								echo 'Teamname:';
 							echo '</td>';
 							echo '<td>';
 								echo '<input type="text" id="clanName" />';
@@ -22,7 +20,7 @@ class PageContent {
 						echo '</tr>';
 						echo '<tr>';
 							echo '<td>';
-								echo 'Tag:';
+								echo 'Teamtag:';
 							echo '</td>';
 							echo '<td>';
 								echo '<input type="text" id="clanTag" />';
@@ -59,15 +57,17 @@ class PageContent {
 							echo '</td>';
 						echo '</tr>';
 					echo '</table>';
+					//echo '<p>Før du kan lage klanen må vi få vite litt mer om den. Vennligst fyll ut litt mer om den. Du kan for øyeblikket bare melde en klan på en compo. Lag flere dersom dere skal delta i flere kompoer.</p>';
 				echo '</td>';
 				echo '<td width="50%">';
-					echo '<h3>Inviter teammates</h3>';
-					echo 'Søk: <input id="inviteSearchBox" type="text" />';
+					echo '<h3>Invite teammates</h3>';
+					echo '<br />';
+					echo 'Search: <input id="inviteSearchBox" type="text" />';
 					echo '<br />';
 					echo '<div id="searchResultsResultPane">';
 
 					echo '</div>';
-					echo '<h3>Inviterte folk:</h3>';
+					echo '<h3>Invited players:</h3>';
 					echo '<div id="invidedPlayers">';
 
 					echo '</div>';
