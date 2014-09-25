@@ -6,7 +6,8 @@ class PageContent {
 	public function render() {
 		$user = Session::getCurrentUser();
 		if(isset($_GET['id'])) {
-			echo '<script src="team.js"> </script>';
+			echo '<script>var clanId = ' . htmlentities($_GET['id'], ENT_QUOTES, 'UTF-8') . ';</script>';
+			echo '<script src="scripts/team.js"> </script>';
 			$team = ClanHandler::getClan($_GET['id']);
 			//echo '<center>';
 				echo '<h1>' . $team->getName() . ' - ' . $team->getTag() . '</h1>';
@@ -53,7 +54,13 @@ class PageContent {
 					echo '</tr>';
 				}
 			echo '</table>';
+			if($team->getChief() == $user->getId()) {
+				echo 'Invite teammates: <input id="inviteSearchBox" type="text" />';
+				echo '<br />';
+				echo '<div id="searchResultsResultPane">';
 
+				echo '</div>';
+			}
 		} else {
 			echo '<h1>Laget finnes ikke!</h1>';
 		}

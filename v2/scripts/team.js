@@ -20,30 +20,27 @@ function updateSearchField()
 			{
 				for(var i = 0; i < userLength; i++)
 				{
-					if( !isInvited(data.users[i].userId) )
-					{
-						var displayName = data.users[i].firstname + ' "' + data.users[i].nickname + '" ' + data.users[i].lastname;
-						$('#searchResultsResultPane').append("<b>" + displayName + '</b> <input type="button" value="Legg til" onclick="inviteUser(\'' + data.users[i].userId + '\', \'' + data.users[i].firstname + ' &quot;' + data.users[i].nickname + '&quot; ' + data.users[i].lastname + '\')" /><br />');
-					}
+					var displayName = data.users[i].firstname + ' "' + data.users[i].nickname + '" ' + data.users[i].lastname;
+					$('#searchResultsResultPane').append("<b>" + displayName + '</b> <input type="button" value="Inviter" onclick="inviteUser(\'' + data.users[i].userId + '\', \'' + data.users[i].firstname + ' &quot;' + data.users[i].nickname + '&quot; ' + data.users[i].lastname + '\')" /><br />');
 				}
 			}
 		}
   	});
 }
+var passthroughUserId = 0;
 function inviteUser(userId, displayName) {
-	if(invitedUserId.length < compoTeamSize-1) {
-		$.getJSON('../api/json/canparticipateincompos.php?id=' + userId, function(data){
-			if(data.result == true) {
-				if(invitedUserId.length<compoTeamSize) {
-					
+	passthroughUserId = userId;
+	$.getJSON('../api/json/canparticipateincompos.php?id=' + passthroughUserId, function(data){
+		if(data.result == true) {
+			$.getJSON('../api/json/invitetoclan.php?id=' + clanId + "&user=" + passthroughUserId, function(data){
+				if(data.result == true) {
+					location.reload();
 				} else {
-					error("Laget ditt er fullt!");
+					error(data.message);
 				}
-			} else {
-				error(data.message);
-			}
-	  	});
-	} else {
-		error("Laget er for stort!");
-	}
+			});
+		} else {
+			error(data.message);
+		}
+  	});
 }
