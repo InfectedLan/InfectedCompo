@@ -60,9 +60,7 @@ class PageContent {
 					//echo '<p>Før du kan lage klanen må vi få vite litt mer om den. Vennligst fyll ut litt mer om den. Du kan for øyeblikket bare melde en klan på en compo. Lag flere dersom dere skal delta i flere kompoer.</p>';
 				echo '</td>';
 				echo '<td width="50%">';
-					echo '<h3>Invite teammates</h3>';
-					echo '<br />';
-					echo 'Search: <input id="inviteSearchBox" type="text" />';
+					echo 'Invite teammates: <input id="inviteSearchBox" type="text" />';
 					echo '<br />';
 					echo '<div id="searchResultsResultPane">';
 
