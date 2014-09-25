@@ -17,7 +17,7 @@
 
 
 body{
-	background-image:url('CompoHP01.jpg');
+	background-image:url('../images/CompoHP01.jpg');
 	-webkit-background-size: cover;
 	-moz-background-size: cover;
 	-o-background-size: cover;
