@@ -1,14 +1,32 @@
+/**************************************/
+/*THE THREE DIFFERENT SCREENS CSS     */
+/**************************************/
+.acceptScreen{
+	display:none;
+	
+	}
+
+.voteScreen{
+	margin-top:10px;
+	}
+
+.playScreen{
+	display:none;
+	}
+
+
+
 body{
-	background-image:url('../images/CompoHP01.jpg');
+	background-image:url('CompoHP01.jpg');
 	-webkit-background-size: cover;
 	-moz-background-size: cover;
 	-o-background-size: cover;
 	background-size: cover;
 	background-repeat: no-repeat;
-	background-color:black;
+	background-color:#4e688f;
 	margin-top:50px;
 	
-	color:#bbbbc0;
+	color:white;
 	font-family:arial;
 }
 
@@ -19,9 +37,10 @@ table {
 
 input {
 	margin: 2px;
+	padding-left:4px;
 	/*width: 100%;*/
 	min-height: 21px;
-	width: 150px;
+	width: 146px;
 	color:#bbbbc0;
 
 	border: 1px solid rgb(15, 42, 59);
@@ -74,7 +93,7 @@ h3 {
 	margin:auto;
 }
 
-	#profileBox, #teamBox, #chatBox, #mainContent, .gameType, #bannerFiller, #Box{
+	#profileBox, #teamBox, #chatBox, #mainContent, .gameType, #bannerFiller, #bannerFiller2, #Box{
 		background-color: rgba(5, 32, 49, 0.9);		
 	}
 
@@ -148,7 +167,7 @@ h3 {
 				bottom:-11px;;
 			}
 	#chatBox{
-		height:435px;	
+		height:440px;	
 		margin-top:20px;
 	}
 	#Box{
@@ -193,16 +212,23 @@ h3 {
 			}
 		
 		.selected{
-			border-bottom: 15px solid rgb(41, 91, 126);
-			height:45px;
+			border-bottom: 10px solid rgb(41, 91, 126);
+			height:50px;
 			padding-top:0px;
 		}
 		
 		#bannerFiller{
+		 width:615px;	
 		 height:100%;
-		 width:615px;
-		 float:left;	
+		 float:left;
+
 		}
+		
+		#bannerFiller2{
+			width: 800px;
+		 height:100%;
+		 float:left;
+			}
 		
 	#mainContent{
 		height:600px;	
@@ -246,7 +272,7 @@ h3 {
 		.playerImg{
 			height:50px;
 			width:66px;
-			background:red;
+			background:none;
 		}
 		
 		.playerName{
@@ -284,6 +310,11 @@ h3 {
 				border: 1px solid rgb(15, 143, 92);
 			}
 			
+			.GOrdy{
+				background: linear-gradient(rgb(30, 121, 86),rgb(21,62,48));
+				border: 1px solid rgb(15, 143, 92);
+			}
+			
 		
 		#vsLeft .playerImg{
 			float:left;
@@ -308,7 +339,15 @@ h3 {
 	
 	
 	
-	/*BUTTONS n shit*/
+	/*BUTTONS n shit*/	
+	.go{
+		background: linear-gradient(#FC3, #C60) !important;
+		border: 2px solid #CC3 !important;
+		margin:auto !important;
+		font-size: 100px !important;
+		width:290px !important;
+		padding: 0px 120px  0 150px!important;
+	}
 	
 	.acpt{
 		background: linear-gradient(rgb(30, 121, 86),rgb(21,62,48));
@@ -338,6 +377,120 @@ h3 {
 		width:400px;
 		margin:auto;
 	}
+
+.info {
+	background-color: rgba(5, 32, 49, 0.9);
+	width: 500px;
+	height: 300px;
+	/*
+	border: 3px solid;
+    border-color: rgb(15, 105, 168);*/
+}	
+
+/********************************************/
+/*				vote screen  				*/
+/********************************************/
+
+.banBoxText{
+	background:none !important;
+	width: 545px !important;
+	height:170px;
+	float:left;
+	margin:10px 0px 10px 65px;
+	
+	position:relative;
+	}
+	.playerNameBanning{
+		color:#336d93;	
+	}
+.banBox{
+	width:240px;
+	height:170px;
+	background: #041724;
+	float:left;
+	margin:10px 0px 10px 65px;
+	
+	position:relative;
+	
+	cursor:pointer;
+	}
+	
+	.banBox img{
+		width: 220px;
+		height:122px;
+		margin:10px auto;
+		margin-bottom:10px;
+		background:green;
+		display:block;
+		
+		}
+		
+		
+		.banBox p{
+			margin: 0 auto;
+			text-align:center;
+		}
+	
+
+/********************************************/
+/*				PLAY screen  				*/
+/********************************************/
+.map{
+	width:200px;
+	height:112px;
+	position:absolute;
+	bottom:0px;
+	left:0px;
+	background:green;
+	}
+
+
+.ippw{
+	margin:30px auto;
+	text-align:center;
+	font-size: 20px;
+	}
+
+
+/********************************************/
+/*				LOGG INN STYLE				*/
+/********************************************/
+#loginInput {
+
+}
+
+#loginbox p {
+	margin: 4px;
+}
+
+#loginbox {
+	width: 450px;
+	height: 110px;
+	margin: 200px auto 0;
+	overflow: auto;
+	background-color: rgba(5, 32, 49, 0.9);
+	
+}
+
+
+.div1{
+		float:left;
+		width:200px;	
+	}
+	
+.div2{
+	float:right;
+	width:250px;
+	margin-top:50px;
+}
+
+#content{
+	width:1350px;
+	overflow:auto;
+	margin:auto;
+}
+
+
 	
 /* Error stuff */
 #errorbox {
