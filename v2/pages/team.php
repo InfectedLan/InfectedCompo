@@ -39,6 +39,19 @@ class PageContent {
 					echo '</tr>';
 				}
 			echo '</table>';
+			echo '<br />';
+			echo '<h1>Inviterte medlemmer</h1>';
+			echo '<br />';
+			echo '<table>';
+				$invites = ClanHandler::getInvites($team);
+				foreach($invites as $invite) {
+					echo '<tr>';
+						echo '<td>';
+							echo UserHandler::getUser($invite->getUserId())->getDisplayName();
+						echo '</td>';
+					echo '</tr>';
+				}
+			echo '</table>';
 
 		} else {
 			echo '<h1>Laget finnes ikke!</h1>';

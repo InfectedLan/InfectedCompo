@@ -3,7 +3,7 @@ $(document).ready(function(){
 		updateSearchField();
 	});
 	$('#compoSelect').change(function() {
-		compoTeamSize = compoTeamSizes[$("#compoSelect").selectedIndex];
+		compoTeamSize = compoTeamSizes[$("#compoSelect option:selected").index()];
 		invitedUserId = [];
 		invitedUserNames = [];
 		updateInvitedList();
