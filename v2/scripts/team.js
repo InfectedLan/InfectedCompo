@@ -44,3 +44,12 @@ function inviteUser(userId, displayName) {
 		}
   	});
 }
+function kickUser(user, clan) {
+	$.getJSON('../api/json/kickfromclan.php?clan=' + clan + "&user=" + user, function(data){
+		if(data.result == true) {
+			location.reload();
+		} else {
+			error(data.message);
+		}
+	});
+}
