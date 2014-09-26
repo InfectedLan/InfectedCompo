@@ -53,3 +53,12 @@ function kickUser(user, clan) {
 		}
 	});
 }
+function deleteInvite(inviteId) {
+	$.getJSON('../api/json/declineinvite.php?id=' + encodeURIComponent(inviteId), function(data){
+		if(data.result) {
+			location.reload();
+		} else {
+			error(data.message);
+		}
+	});
+}

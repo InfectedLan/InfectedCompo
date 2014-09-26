@@ -38,7 +38,7 @@ function updateCompoStatus() {
 			if(data.data.invites.length != 0) {
 				//$("#teamData").append("<h3>Invites</h3>");
 				for(var i = 0; i < data.data.invites.length; i++) {
-					$("#teamData").append('<div class="teamEntry" id="teamHeaderId' + data.data.invites[i].clanData.id + '"><h1>' + data.data.invites[i].clanTag + '</h1><h3> - ' + data.data.invites[i].compo.tag + '</h3><br /><i class="teamEntry" id="inviteAccept' + data.data.invites[i].id + '">Godta</i> - <i class="teamEntry" id="inviteDecline' + data.data.invites[i].id + '">Avslå</i></div>');
+					$("#teamData").append('<div class="teamEntry" id="teamHeaderId' + data.data.invites[i].clanData.id + '"><h1>' + data.data.invites[i].clanData.tag + '</h1><h3> - ' + data.data.invites[i].compo.tag + '</h3><br /><i class="teamEntry" id="inviteAccept' + data.data.invites[i].id + '">Godta</i> - <i class="teamEntry" id="inviteDecline' + data.data.invites[i].id + '">Avslå</i></div>');
 					$("#inviteAccept" + data.data.invites[i].id).click({inviteId: data.data.invites[i].id}, function(e){acceptInvite(e.data.inviteId)});
 					$("#inviteDecline" + data.data.invites[i].id).click({inviteId: data.data.invites[i].id}, function(e){declineInvite(e.data.inviteId)});
 					$("#teamInviteId" + data.data.invites[i].clanData.id).click({teamId: data.data.invites[i].clanData.id}, function(e){window.location="index.php?page=team&id=" + e.data.teamId});

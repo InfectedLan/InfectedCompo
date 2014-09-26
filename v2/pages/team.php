@@ -49,7 +49,11 @@ class PageContent {
 				foreach($invites as $invite) {
 					echo '<tr>';
 						echo '<td>';
-							echo UserHandler::getUser($invite->getUserId())->getDisplayName();
+							if($team->getChief() == $user->getId()) {
+								echo UserHandler::getUser($invite->getUserId())->getDisplayName() . '<input type="button" value="Slett invite" onClick="deleteInvite(' . $invite->getId() . ')" />';
+							} else {
+								echo UserHandler::getUser($invite->getUserId())->getDisplayName();
+							}
 						echo '</td>';
 					echo '</tr>';
 				}
