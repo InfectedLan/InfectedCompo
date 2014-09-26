@@ -160,11 +160,77 @@ function handleAcceptState(data) {
 		}
 	}
 }
+function isChief(data) {
+	for(var i = 0; i < data.matchData.banData.clans.length; i++) {
+		for(var x = 0; x < data.matchData.banData.clans[i].members.length; x++) {
+			if(data.matchData.banData.clans[i].members[x].userId == myUserId) {
+				return data.matchData.banData.clans[i].members[x].chief;
+			}
+		}
+	}
+	return false;
+}
+function getCurrentPicker(data) {
+	var turn = data.matchData.banData.turn;
+	for(var i = 0; i < data.matchData.banData.clans[turn].members.length; i++) {
+		if(data.matchData.banData.clans[turn].members[i].chief) {
+			return data.matchData.banData.clans[turn].members[i].nick;
+		}
+	}
+}
 function handleCustomState(data) {
-
+	if(currentPage == "match") {
+		var banData = [];
+		banData.push('<div class="voteScreen">');
+			banData.push('<div class="banBoxText">');
+	            banData.push('<br>');
+	            banData.push('<br>');
+	            if(data.matchData.banData.turn == 2) {
+	            	banData.push('<p style="text-align:right; margin:30px 0px 0px;">Vennligst vent...</p>');
+	            	banData.push('<p style="font-size: 30px; margin-top: 0px; text-align:right;"></p>');
+	            } else {
+	            	banData.push('<p style="text-align:right; margin:30px 0px 0px;">Klikk et map når det er din tur til å banne map</p>');
+	            	banData.push('<p style="font-size: 30px; margin-top: 0px; text-align:right;">Det er <span class="playerNameBanning">"'+ getCurrentPicker(data) + '" </span> sin tur til å banne</p>');
+	            }
+	            banData.push('<br>');
+	        banData.push('</div>');
+	        for(var i = 0; i < data.matchData.banData.options.length; i++) {
+	        	banData.push('<div id="banBoxId' + i + '" class="banBox">');
+	        		if(data.matchData.banData.options[i].isBanned) {
+	        			banData.push('<img src="images/' + data.matchData.banData.options[i].thumbnailUrl + '_banned.png"/>');
+	        		} else {
+						banData.push('<img src="images/' + data.matchData.banData.options[i].thumbnailUrl + '.png"/>');
+	        		}
+	        		banData.push('<p>' + data.matchData.banData.options[i].name + '</p>');
+	        	banData.push('</div>');
+	        }
+        banData.push('</div>');
+        $("#mainContent").html(banData.join(""));
+        for(var i = 0; i < data.matchData.banData.options.length; i++) {
+	        	$("#banBoxId" + i).click({mapId: data.matchData.banData.options[i].id}, function(e) {
+	        		banMap(e.data.mapId);
+	        	});
+	        }
+	} else {
+		if(isChief(data)) {
+			$("#teamData").html("<center><h1>Du er chief!</h1>Vennligst gå <a href='index.php?page=match'>hit</a> for å banne maps");
+			$("#addTeam").remove();
+		} else {
+			//console.log("Not chief, not on match");
+		}
+	}
 }
 function handlePlayState(data) {
 
+}
+function banMap(mapId) {
+	$.getJSON('../api/json/banmap.php?id=' + encodeURIComponent(mapId) + '&matchId=' + matchId, function(data){
+		if(data.result) {
+			matchWatchdog();
+		} else {
+			error(data.message);
+		}
+	});
 }
 function acceptMatch(id) {
 	$.getJSON('../api/json/acceptmatch.php?id=' + encodeURIComponent(id), function(data){
