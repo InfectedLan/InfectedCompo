@@ -34,6 +34,7 @@ class PageContent {
 			}
 			echo '</ul>';
 			if(count($teams) != $numQualified) {
+				echo '<br />';
 				echo '<h3>Ufullstendige lag:</h3>';
 				echo '<br />';
 				echo '<ul>';
@@ -57,6 +58,9 @@ class PageContent {
 					$first = false;
 				}
 			echo '];</script>';
+			if($compo->getId() == 1) {
+				echo '<a href="http://www.facebook.com/l.php?u=http%3A%2F%2Fbinarybeast.com%2FxCSGO1409260&h=PAQHMe1Am">Link til brackets</a>';
+			}
 		} else {
 			echo '<h1>Compoen finnes ikke!</h1>';
 		}

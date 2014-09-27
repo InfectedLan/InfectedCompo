@@ -78,6 +78,8 @@ function matchWatchdog() {
 					handleCustomState(data);
 				} else if(data.matchData.state == 2) {
 					handlePlayState(data);
+				} else {
+					error("Unknown state: " + data.matchData.state);
 				}
 			}
 		} else {
@@ -213,7 +215,7 @@ function handleCustomState(data) {
 	        }
 	} else {
 		if(isChief(data)) {
-			$("#teamData").html("<center><h1>Du er chief!</h1>Vennligst gå <a href='index.php?page=match'>hit</a> for å banne maps");
+			$("#teamData").html("<center><h1>Du er chief!</h1>Vennligst gå <a href='index.php?page=match'>hit</a> for å banne maps</center>");
 			$("#addTeam").remove();
 		} else {
 			//console.log("Not chief, not on match");
@@ -221,7 +223,47 @@ function handleCustomState(data) {
 	}
 }
 function handlePlayState(data) {
+	if(currentPage == "match") {
+		if(data.matchData.compoId == 2) { //LoL
+			var matchData = [];
 
+			matchData.push("<h1>Gamet er klart!</h1>");
+			matchData.push("<p>" + data.matchData.gameData.clans[0].clanName + " lager et game med " + data.matchData.gameData.connectDetails + "</p>");
+			matchData.push("<br />");
+			matchData.push("<i>Si ifra til game når dere er ferdige</i>");
+
+			$("#mainContent").html(matchData.join(""));
+		} else if(data.matchData.compoId == 1) { //CS:GO
+			var matchData = [];
+
+			matchData.push('<div class="playScreen">');
+            	matchData.push('<div style="position:relative; overflow:auto; height:200px;">');
+                    matchData.push('<div style="float:left; position:relative; width:50%; height:100%;">');
+                    	matchData.push('<p style="float:right; position:absolute; bottom:0; right:20px; font-size:30px; margin-bottom:0px;">Map: ' + data.matchData.gameData.mapData.name + ' </p>');
+                    matchData.push('</div>');
+                    matchData.push('<div style="float:left; position:relative; width:50%;  height:100%">');
+                    	matchData.push('<div class="map">');
+                    		matchData.push('<img src="images/' + data.matchData.gameData.mapData.thumbnail + '.png" />');
+                        matchData.push('</div>');
+                    matchData.push('</div>');
+                matchData.push('</div>');
+            	matchData.push('<br>');
+            	//matchData.push('<p id="startGameBtn" class="acpt acptLarge go">PLAY</p>');
+                matchData.push('<p style="text-align: center;">Skriv i konsollen: <i>' + data.matchData.gameData.connectDetails + '</i></p>');
+                matchData.push('<p class="ippw">Hvert lag er nødt til å skrive !map de_' + data.matchData.gameData.mapData.name.toLowerCase() + ' når de kobler til</p>');
+            matchData.push('</div>');
+			$("#mainContent").html(matchData.join(""));
+			$("#startGameBtn").click({consoleData: data.matchData.gameData.connectDetails}, function(e) {
+				startGame(e.data.consoleData);
+			});
+		}
+	} else {
+		$("#teamData").html("<center><h1>Gamet ditt er klart!</h1>Vennligst gå <a href='index.php?page=match'>hit</a> for å starte</center>");
+		$("#addTeam").remove();
+	}
+}
+function startGame(consoleData) {
+	window.location = 'steam://rungameid/730//' + encodeURIComponent(consoleData);
 }
 function banMap(mapId) {
 	$.getJSON('../api/json/banmap.php?id=' + encodeURIComponent(mapId) + '&matchId=' + matchId, function(data){
