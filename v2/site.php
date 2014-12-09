@@ -7,22 +7,17 @@ require_once 'handlers/tickethandler.php';
 require_once 'handlers/matchhandler.php';
 
 class Site {
-	
-	public function __construct() {
-
-	}
-	
 	// Execute the site.
 	public function execute() {
 		echo '<!DOCTYPE html>';
 			echo '<head>';
 				echo '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
-			    echo '<link rel="stylesheet" type="text/css" href="style/style.css">';
+			    echo '<link rel="stylesheet" type="text/css" href="styles/style.css">';
 
 			    echo '<title>' . $this->getTitle() . '</title>';
 
 				echo '<script src="../api/scripts/jquery-1.11.1.min.js"></script>';
-			    echo '<link href="../api/style/jquery-ui-1.11.1.css" rel="stylesheet" type="text/css" />';
+			    echo '<link href="../api/styles/jquery-ui-1.11.1.css" rel="stylesheet" type="text/css" />';
 				echo '<script src="../api/scripts/jquery-ui-1.11.1.min.js"></script>';
 
 				//Custom javascripts. This HAS to be included after jquery
