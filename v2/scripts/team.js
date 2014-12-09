@@ -45,7 +45,7 @@ function inviteUser(userId, displayName) {
   	});
 }
 function kickUser(user, clan) {
-	$.getJSON('../api/json/kickfromclan.php?clan=' + clan + "&user=" + user, function(data){
+	$.getJSON('../api/json/clan/kickFromClan.php?clan=' + clan + "&user=" + user, function(data){
 		if(data.result == true) {
 			location.reload();
 		} else {
@@ -54,7 +54,7 @@ function kickUser(user, clan) {
 	});
 }
 function deleteInvite(inviteId) {
-	$.getJSON('../api/json/declineinvite.php?id=' + encodeURIComponent(inviteId), function(data){
+	$.getJSON('../api/json/invite/declineInvite.php?id=' + encodeURIComponent(inviteId), function(data){
 		if(data.result) {
 			location.reload();
 		} else {

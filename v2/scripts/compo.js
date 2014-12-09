@@ -26,7 +26,7 @@ function addTeam()
 	window.location.href = "index.php?page=addTeam";
 }
 function updateCompoStatus() {
-	$.getJSON('../api/json/getcompostatus.php', function(data){
+	$.getJSON('../api/json/compo/getCompoStatus.php', function(data){
 		if(data.result == true) {
 			if(shouldRefreshTeamData) {
  				$("#teamData").html("");
@@ -69,7 +69,7 @@ function disableMatchWatchdog() {
 	clearInterval(matchStatusUpdateId);
 }
 function matchWatchdog() {
-	$.getJSON('../api/json/getmatchstatus.php?id=' + matchId, function(data){
+	$.getJSON('../api/json/match/getMatchStatus.php?id=' + matchId, function(data){
 		if(data.result == true) {
 			if(data.matchData.state != lastMatchState) {
 				if(data.matchData.state == 0) {
@@ -275,7 +275,7 @@ function banMap(mapId) {
 	});
 }
 function acceptMatch(id) {
-	$.getJSON('../api/json/acceptmatch.php?id=' + encodeURIComponent(id), function(data){
+	$.getJSON('../api/json/match/acceptMatch.php?id=' + encodeURIComponent(id), function(data){
 		if(data.result) {
 			window.location = "index.php?page=match";	
 		} else {
@@ -284,7 +284,7 @@ function acceptMatch(id) {
 	});
 }
 function acceptInvite(inviteId) {
-	$.getJSON('../api/json/acceptinvite.php?id=' + encodeURIComponent(inviteId), function(data){
+	$.getJSON('../api/json/invite/acceptInvite.php?id=' + encodeURIComponent(inviteId), function(data){
 		if(data.result) {
 			updateCompoStatus();
 		} else {
@@ -293,7 +293,7 @@ function acceptInvite(inviteId) {
 	});
 }
 function declineInvite(inviteId) {
-	$.getJSON('../api/json/declineinvite.php?id=' + encodeURIComponent(inviteId), function(data){
+	$.getJSON('../api/json/invite/declineInvite.php?id=' + encodeURIComponent(inviteId), function(data){
 		if(data.result) {
 			updateCompoStatus();
 		} else {
