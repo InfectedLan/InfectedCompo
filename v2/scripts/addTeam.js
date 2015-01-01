@@ -18,9 +18,8 @@ var compoTeamSize = 0;
 function updateSearchField()
 {
 	var query = $('#inviteSearchBox').val();
-	updateKey = Math.random();
-	$.getJSON('../api/json/searchusers.php?key=' + encodeURIComponent(updateKey) + "&query=" + encodeURIComponent( query ), function(data){
-		if(data.result == true && data.key == updateKey)
+	$.getJSON('../api/json/user/findUser.php?query=' + encodeURIComponent( query ), function(data){
+		if(data.result == true)
 		{
 			$('#searchResultsResultPane').html("");
 			var userLength = data.users.length;
@@ -35,7 +34,7 @@ function updateSearchField()
 					if( !isInvited(data.users[i].userId) )
 					{
 						var displayName = data.users[i].firstname + ' "' + data.users[i].nickname + '" ' + data.users[i].lastname;
-						$('#searchResultsResultPane').append("<b>" + displayName + '</b> <input type="button" value="Legg til" onclick="inviteUser(\'' + data.users[i].userId + '\', \'' + data.users[i].firstname + ' &quot;' + data.users[i].nickname + '&quot; ' + data.users[i].lastname + '\')" /><br />');
+						$('#searchResultsResultPane').append("<b>" + displayName + '</b> <input type="button" value="Legg til" onclick="inviteUser(\'' + data.users[i].id + '\', \'' + data.users[i].firstname + ' &quot;' + data.users[i].nickname + '&quot; ' + data.users[i].lastname + '\')" /><br />');
 					}
 				}
 			}
@@ -43,26 +42,17 @@ function updateSearchField()
   	});
 }
 function inviteUser(userId, displayName) {
-	if(invitedUserId.length < compoTeamSize-1) {
-		$.getJSON('../api/json/canparticipateincompos.php?id=' + userId, function(data){
-			if(data.result == true) {
-				if(invitedUserId.length<compoTeamSize)
-				{
-					invitedUserId.push(userId);
-					invitedUserNames.push(displayName);
+	$.getJSON('../api/json/user/isEligibleForCompoParticipation.php?id=' + userId, function(data){
+		if(data.result == true) {
+			invitedUserId.push(userId);
+			invitedUserNames.push(displayName);
 
-					updateSearchField();
-					updateInvitedList();
-				} else {
-					error("Laget ditt er fullt!");
-				}
-			} else {
-				error(data.message);
-			}
-	  	});
-	} else {
-		error("Laget er for stort!");
-	}
+			updateSearchField();
+			updateInvitedList();
+		} else {
+			error(data.message);
+		}
+  	});
 }
 function updateInvitedList() {
 	$('#invidedPlayers').html("");
@@ -99,7 +89,7 @@ function registerClan() {
 		if(clanName == "" || clanTag == "") {
 			error("Du må skrive clan name og tag!");
 		} else {
-			$.getJSON('../api/json/registerclan.php?name=' + encodeURIComponent(clanName) + "&tag=" + encodeURIComponent(clanTag) + "&compo=" + encodeURIComponent( $("#compoSelect").val() ), function(data){
+			$.getJSON('../api/json/clan/registerClan.php?name=' + encodeURIComponent(clanName) + "&tag=" + encodeURIComponent(clanTag) + "&compo=" + encodeURIComponent( $("#compoSelect").val() ), function(data){
 				if(data.result == true) {
 					clanId = data.clanId;
 					for(var i = 0; i < invitedUserId.length; i++) {
