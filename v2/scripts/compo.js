@@ -266,7 +266,7 @@ function startGame(consoleData) {
 	window.location = 'steam://rungameid/730//' + encodeURIComponent(consoleData);
 }
 function banMap(mapId) {
-	$.getJSON('../api/json/banmap.php?id=' + encodeURIComponent(mapId) + '&matchId=' + matchId, function(data){
+	$.getJSON('../api/json/match/banmap.php?id=' + encodeURIComponent(mapId) + '&matchId=' + matchId, function(data){
 		if(data.result) {
 			matchWatchdog();
 		} else {
