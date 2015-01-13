@@ -12,10 +12,10 @@ $(document).ready(function() {
 	compoStatusUpdateId = setInterval(updateCompoStatus, 15000);
 	updateCompoStatus();
 	$("#gameBannerCsGo").click(function(e) { 
-		window.location = "index.php?page=compo&id=1";
+		window.location = "index.php?page=compo&id=3";
 	});
 	$("#gameBannerLoL").click(function(e) { 
-		window.location = "index.php?page=compo&id=2";
+		window.location = "index.php?page=compo&id=4";
 	});
 	$("#gameBannerCurrentMatch").click(function(e) {
 		window.location = "index.php?page=match";
