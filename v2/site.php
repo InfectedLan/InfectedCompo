@@ -32,6 +32,7 @@ class Site {
 				{
 					echo '<script src="scripts/compo.js"></script>';
 					$user = Session::getCurrentUser();
+					$event = EventHandler::getCurrentEvent();
 					echo '<script>';
 						echo 'var myUserId = ' . $user->getId() . ';';
 						echo 'var currentPage = "' . htmlentities($_GET['page'], ENT_QUOTES, 'UTF-8') . '";';
