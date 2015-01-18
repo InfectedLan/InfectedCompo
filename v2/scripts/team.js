@@ -6,9 +6,8 @@ $(document).ready(function(){
 function updateSearchField()
 {
 	var query = $('#inviteSearchBox').val();
-	updateKey = Math.random();
-	$.getJSON('../api/json/searchusers.php?key=' + encodeURIComponent(updateKey) + "&query=" + encodeURIComponent( query ), function(data){
-		if(data.result == true && data.key == updateKey)
+	$.getJSON('../api/json/user/findUser.php?query=' + encodeURIComponent( query ), function(data){
+		if(data.result == true)
 		{
 			$('#searchResultsResultPane').html("");
 			var userLength = data.users.length;
@@ -21,7 +20,7 @@ function updateSearchField()
 				for(var i = 0; i < userLength; i++)
 				{
 					var displayName = data.users[i].firstname + ' "' + data.users[i].nickname + '" ' + data.users[i].lastname;
-					$('#searchResultsResultPane').append("<b>" + displayName + '</b> <input type="button" value="Inviter" onclick="inviteUser(\'' + data.users[i].userId + '\', \'' + data.users[i].firstname + ' &quot;' + data.users[i].nickname + '&quot; ' + data.users[i].lastname + '\')" /><br />');
+					$('#searchResultsResultPane').append("<b>" + displayName + '</b> <input type="button" value="Inviter" onclick="inviteUser(\'' + data.users[i].id + '\', \'' + data.users[i].firstname + ' &quot;' + data.users[i].nickname + '&quot; ' + data.users[i].lastname + '\')" /><br />');
 				}
 			}
 		}
@@ -30,9 +29,9 @@ function updateSearchField()
 var passthroughUserId = 0;
 function inviteUser(userId, displayName) {
 	passthroughUserId = userId;
-	$.getJSON('../api/json/canparticipateincompos.php?id=' + passthroughUserId, function(data){
+	$.getJSON('../api/json/user/isEligibleForCompoParticipation.php?id=' + passthroughUserId, function(data){
 		if(data.result == true) {
-			$.getJSON('../api/json/invitetoclan.php?id=' + clanId + "&user=" + passthroughUserId, function(data){
+			$.getJSON('../api/json/clan/inviteToClan.php?id=' + clanId + "&user=" + passthroughUserId, function(data){
 				if(data.result == true) {
 					location.reload();
 				} else {
@@ -56,6 +55,24 @@ function kickUser(user, clan) {
 function deleteInvite(inviteId) {
 	$.getJSON('../api/json/invite/declineInvite.php?id=' + encodeURIComponent(inviteId), function(data){
 		if(data.result) {
+			location.reload();
+		} else {
+			error(data.message);
+		}
+	});
+}
+function setAsPrimaryPlayer(userId, teamId) {
+	$.getJSON('../api/json/clan/setAsPrimaryPlayer.php?clan=' + teamId + "&user=" + userId, function(data){
+		if(data.result == true) {
+			location.reload();
+		} else {
+			error(data.message);
+		}
+	});
+}
+function setAsStepinPlayer(userId, teamId) {
+	$.getJSON('../api/json/clan/setAsStepinPlayer.php?clan=' + teamId + "&user=" + userId, function(data){
+		if(data.result == true) {
 			location.reload();
 		} else {
 			error(data.message);

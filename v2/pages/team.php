@@ -15,10 +15,11 @@ class PageContent {
 				$compo = ClanHandler::getCompo($team);
 				echo '<h3>' . $compo->getName() . '</h3>';
 
-			$members = $team->getMembers();
+			$playingMembers = ClanHandler::getPlayingMembers($team);
+			$stepinMembers = ClanHandler::getStepinMembers($team);
 			//echo '</center>';
 			if($team->getChief() == $user->getId()) {
-				if(count($members) != $compo->getTeamSize()) {
+				if(count($playingMembers) != $compo->getTeamSize()) {
 					echo '<br /><b>ADVARSEL: Laget er ikke fullt, og vil ikke være kvalifisert til compoen før det er fullt!</b>';
 				}
 			}
@@ -30,11 +31,14 @@ class PageContent {
 			echo '<h1>Medlemmer</h1>';
 			echo '<br />';
 			echo '<table>';
-				foreach ($members as $member) {
+				foreach ($playingMembers as $member) {
 					echo '<tr>';
-						$canKick = ($member->getId() != $team->getChief()) && ($user->getId() == $team->getChief());
-						if($canKick) {
-							echo '<td>' . $member->getDisplayName() . '</td><td><input type="button" value="Kick" onclick="kickUser(' . $member->getId() . ', ' . $team->getId() . ')" /></td>';
+						if($user->getId() == $team->getChief()) { //Are we a chief?
+							if($member->getId() != $team->getChief()) { //Only show kick button if this isnt us
+								echo '<td>' . $member->getDisplayName() . '</td><td><input type="button" value="Set as stepin" onclick="setAsStepinPlayer(' . $member->getId() . ', ' . $team->getId() . ')" /></td><td><input type="button" value="Kick" onclick="kickUser(' . $member->getId() . ', ' . $team->getId() . ')" /></td>';
+							} else {
+								echo '<td>' . $member->getDisplayName() . '</td><td><input type="button" value="Set as stepin" onclick="setAsStepinPlayer(' . $member->getId() . ', ' . $team->getId() . ')" /></td>';
+							}
 						} else {
 							echo '<td>' . $member->getDisplayName() . '</td>';
 						}
@@ -42,6 +46,26 @@ class PageContent {
 				}
 			echo '</table>';
 			echo '<br />';
+			if(count($stepinMembers) > 0) {
+				echo '<h1>Step-in medlemmer</h1>';
+				echo '<br />';
+				echo '<table>';
+					foreach ($stepinMembers as $member) {
+						echo '<tr>';
+							if($user->getId() == $team->getChief()) { //Are we a chief?
+								if($member->getId() != $team->getChief()) { //Only show kick button if this isnt us
+									echo '<td>' . $member->getDisplayName() . '</td><td><input type="button" value="Set as primary player" onclick="setAsPrimaryPlayer(' . $member->getId() . ', ' . $team->getId() . ')" /></td><td><input type="button" value="Kick" onclick="kickUser(' . $member->getId() . ', ' . $team->getId() . ')" /></td>';
+								} else {
+									echo '<td>' . $member->getDisplayName() . '</td><td><input type="button" value="Set as primary player" onclick="setAsPrimaryPlayer(' . $member->getId() . ', ' . $team->getId() . ')" /></td>';
+								}
+							} else {
+								echo '<td>' . $member->getDisplayName() . '</td>';
+							}
+						echo '</tr>';
+					}
+				echo '</table>';
+				echo '<br />';
+			}
 			echo '<h1>Inviterte medlemmer</h1>';
 			echo '<br />';
 			echo '<table>';

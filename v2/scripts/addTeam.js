@@ -93,7 +93,7 @@ function registerClan() {
 				if(data.result == true) {
 					clanId = data.clanId;
 					for(var i = 0; i < invitedUserId.length; i++) {
-						$.getJSON('../api/json/invitetoclan.php?id=' + data.clanId + "&user=" + invitedUserId[i], function(data){
+						$.getJSON('../api/json/clan/inviteToClan.php?id=' + data.clanId + "&user=" + invitedUserId[i], function(data){
 							invitedPeople++;
 							if(invitedPeople==invitedUserId.length) {
 								info("Clanen ble registrert!", function() {window.location = "index.php?page=team&id=" + clanId});
