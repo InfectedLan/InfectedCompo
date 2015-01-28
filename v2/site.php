@@ -53,7 +53,7 @@ class Site {
 				                	echo '<img src="../api/' . $avatarFile . '"></img>';
 				                echo '</div>';
 				                echo '<div id="userName">';
-				                	echo '<p>' . $user->getDisplayName() . '</p>';
+				                	echo '<p>' . $user->getCompoDisplayName() . '</p>';
 				                echo '</div>';
 				            echo '</div>';
 				            echo '<div id="teamBox">';
