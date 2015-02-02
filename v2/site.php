@@ -55,6 +55,9 @@ class Site {
 				                echo '<div id="userName">';
 				                	echo '<p>' . $user->getDisplayName() . '</p>';
 				                echo '</div>';
+				                echo '<div>';
+				                	echo '<a id="logOutLabel" href="javascript:logout()">Logg ut</a>';
+				                echo '</div>';
 				            echo '</div>';
 				            echo '<div id="teamBox">';
 				                echo '<p style="position:absolute; top:-45px;">Teams</p>';
@@ -116,7 +119,7 @@ class Site {
 						echo '<form class="login" method="post">';
 							echo '<ul>';
 								echo '<li>';
-									echo '<input class="input" type="text" name="username" placeholder="Brukernavn">';
+									echo '<input class="input" type="text" name="identifier" placeholder="Brukernavn">';
 								echo '</li>';
 								echo '<li>';
 									echo '<input class="input" name="password" type="password" placeholder="Passord">';

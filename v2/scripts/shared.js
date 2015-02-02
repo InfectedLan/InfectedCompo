@@ -53,3 +53,12 @@ $(document).ready(function() {
 	});
 });
 var errorFunction = 0;
+function logout() {
+	$.getJSON('../api/json/session/logout.php', function(data){
+		if(data.result == true) {
+			location.reload();
+		} else {
+			error(data.message);
+		}
+  	});
+}
