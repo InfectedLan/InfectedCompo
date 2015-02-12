@@ -146,7 +146,7 @@ class Site {
 	
 	// Generates title.
 	private function getTitle() {
-		return Settings::name . ' compo system';
+		return Settings::name . ' Compo';
 	}
 	
 	private function viewPage($pageName) {
