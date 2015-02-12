@@ -14,12 +14,16 @@ class Site {
 				echo '<title>' . $this->getTitle() . '</title>';
 				echo '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
 			    echo '<link rel="stylesheet" type="text/css" href="styles/style.css">';
+			    echo '<link rel="stylesheet" type="text/css" href="../api/styles/chat.css">';
 				echo '<link href="../api/styles/jquery-ui-1.11.1.css" rel="stylesheet" type="text/css" />';
 				echo '<script src="../api/scripts/jquery-1.11.1.min.js"></script>';
 				echo '<script src="../api/scripts/jquery-ui-1.11.1.min.js"></script>';
 
 				//Custom javascripts. This HAS to be included after jquery
 				echo '<script src="scripts/shared.js"></script>';
+				echo '<script src="../api/scripts/chat.js"></script>';
+
+				echo '<script>$(document).ready(function() {createChat("chatContainer", 1, 415);});</script>';
 			echo '</head>';
 
 			echo '<body>';
@@ -35,7 +39,7 @@ class Site {
 					$event = EventHandler::getCurrentEvent();
 					echo '<script>';
 						echo 'var myUserId = ' . $user->getId() . ';';
-						echo 'var currentPage = "' . htmlentities($_GET['page'], ENT_QUOTES, 'UTF-8') . '";';
+						echo 'var currentPage = "' . ( isset($_GET['page']) ? htmlentities($_GET['page'], ENT_QUOTES, 'UTF-8') : "none" ) . '";';
 					echo '</script>';
 					echo '<div id="content">';
 				        echo '<div id="leftColumn">';
@@ -53,7 +57,7 @@ class Site {
 				                	echo '<img src="../api/' . $avatarFile . '"></img>';
 				                echo '</div>';
 				                echo '<div id="userName">';
-				                	echo '<p>' . $user->getDisplayName() . '</p>';
+				                	echo '<p>' . $user->getCompoDisplayName() . '</p>';
 				                echo '</div>';
 				                echo '<div>';
 				                	echo '<a id="logOutLabel" href="javascript:logout()">Logg ut</a>';
@@ -67,6 +71,8 @@ class Site {
 				                echo '<p id="addTeam"><span style="font-size:20px; margin-top:-15px;">+</span> Add Team</p>';
 				            echo '</div>';
 				            echo '<div id="chatBox">';
+				            echo '<div class="boxTitle"><p class="boxTitleText">Chat</p></div>';
+				            echo '<div id="chatContainer"></div>';
 				            echo '</div>';
 				        echo '</div>';
 				        echo '<div id="rightColumn">';
@@ -119,7 +125,7 @@ class Site {
 						echo '<form class="login" method="post">';
 							echo '<ul>';
 								echo '<li>';
-									echo '<input class="input" type="text" name="identifier" placeholder="Brukernavn">';
+									echo '<input class="input" type="text" name="identifier" placeholder="Brukernavn, E-post eller Telefon">';
 								echo '</li>';
 								echo '<li>';
 									echo '<input class="input" name="password" type="password" placeholder="Passord">';
