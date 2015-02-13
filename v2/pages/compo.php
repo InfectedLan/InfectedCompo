@@ -7,8 +7,13 @@ class PageContent {
 		$user = Session::getCurrentUser();
 		if(isset($_GET['id'])) {
 			echo '<script src="scripts/viewCompo.js"></script>';
+			echo '<script src="../api/scripts/bracket.js"></script>';
 			$compo = CompoHandler::getCompo($_GET['id']);
 			echo '<h1>' . $compo->getName() . '</h1>';
+			if(CompoHandler::hasGeneratedMatches($compo)) {
+				echo '<div class="bracket_container" id="bracket_container"></div>';
+				echo '<script>createBracketRenderer("bracket_container", ' . $compo->getId() . ');</script>';
+			}
 			echo '<br />';
 			//Get list of teams
 			$teams = CompoHandler::getClans($compo);
@@ -58,9 +63,6 @@ class PageContent {
 					$first = false;
 				}
 			echo '];</script>';
-			if($compo->getId() == 1) {
-				echo '<a href="http://www.facebook.com/l.php?u=http%3A%2F%2Fbinarybeast.com%2FxCSGO1409260&h=PAQHMe1Am">Link til brackets</a>';
-			}
 		} else {
 			echo '<h1>Compoen finnes ikke!</h1>';
 		}

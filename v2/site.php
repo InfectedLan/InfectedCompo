@@ -14,6 +14,7 @@ class Site {
 				echo '<title>' . $this->getTitle() . '</title>';
 				echo '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
 			    echo '<link rel="stylesheet" type="text/css" href="styles/style.css">';
+			    echo '<link rel="stylesheet" type="text/css" href="../api/styles/bracket.css">';
 				echo '<link href="../api/styles/jquery-ui-1.11.1.css" rel="stylesheet" type="text/css" />';
 				echo '<script src="../api/scripts/jquery-1.11.1.min.js"></script>';
 				echo '<script src="../api/scripts/jquery-ui-1.11.1.min.js"></script>';

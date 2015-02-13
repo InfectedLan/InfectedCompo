@@ -240,8 +240,9 @@ h3 {
 			}
 		
 	#mainContent{
-		height:600px;	
+		min-height:600px;	
 		padding: 10px;
+		overflow: scroll-y;
 	}
 	
 	

@@ -74,18 +74,26 @@ function matchWatchdog() {
 			if(data.matchData.state != lastMatchState) {
 				if(data.matchData.state == 0) {
 					handleAcceptState(data);
+					appendChat(data.matchData);
 				} else if(data.matchData.state == 1) {
 					handleCustomState(data);
+					appendChat(data.matchData);
 				} else if(data.matchData.state == 2) {
 					handlePlayState(data);
+					appendChat(data.matchData);
 				} else {
 					error("Unknown state: " + data.matchData.state);
 				}
+				lastMatchState = data.matchData.state;
 			}
 		} else {
 			error(data.message);
 		}
   	});
+}
+function appendChat(matchData) {
+	$("#mainContent").append('<div id="compoChatField"></div>');
+	createChat("compoChatField", matchData.chatId, 300);
 }
 function hasAccepted(data) {
 	for(var i = 0; i < data.matchData.readyData.length; i++) {
