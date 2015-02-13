@@ -60,30 +60,34 @@ function updateCompoStatus() {
 		}
   	});
 }
+
 function initMatchWatchdog(newMatchId) {
 	matchId = newMatchId;
 	matchStatusUpdateId = setInterval(matchWatchdog, 5000);
 	matchWatchdog();
 }
+
 function disableMatchWatchdog() {
 	clearInterval(matchStatusUpdateId);
 }
+
 function matchWatchdog() {
 	$.getJSON('../api/json/match/getMatchStatus.php?id=' + matchId, function(data){
 		if(data.result == true) {
 			if(data.matchData.state != lastMatchState) {
 				if(data.matchData.state == 0) {
 					handleAcceptState(data);
-					appendChat(data.matchData);
 				} else if(data.matchData.state == 1) {
 					handleCustomState(data);
-					appendChat(data.matchData);
 				} else if(data.matchData.state == 2) {
 					handlePlayState(data);
-					appendChat(data.matchData);
 				} else {
 					error("Unknown state: " + data.matchData.state);
 				}
+				if(currentPage == "match") {
+					appendChat(data.matchData);
+				}
+
 				lastMatchState = data.matchData.state;
 			}
 		} else {
@@ -232,16 +236,16 @@ function handleCustomState(data) {
 }
 function handlePlayState(data) {
 	if(currentPage == "match") {
-		if(data.matchData.compoId == 2) { //LoL
+		if(data.matchData.compoId == 4) { //LoL
 			var matchData = [];
 
 			matchData.push("<h1>Gamet er klart!</h1>");
-			matchData.push("<p>" + data.matchData.gameData.clans[0].clanName + " lager et game med " + data.matchData.gameData.connectDetails + "</p>");
+			matchData.push("<p>Dere er ansvarlige for å lage et custom game. Bruk chatten for å dele informasjon.</p>");
 			matchData.push("<br />");
 			matchData.push("<i>Si ifra til game når dere er ferdige</i>");
 
 			$("#mainContent").html(matchData.join(""));
-		} else if(data.matchData.compoId == 1) { //CS:GO
+		} else if(data.matchData.compoId == 3) { //CS:GO
 			var matchData = [];
 
 			matchData.push('<div class="playScreen">');

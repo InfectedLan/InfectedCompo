@@ -277,6 +277,14 @@ a {
 	#vsBox{
 		padding:0px 60px;	
 	}
+
+	#vsBox:after {
+	    content: ".";
+	    display: block;
+	    height: 0;
+	    clear: both;
+	    visibility: hidden;
+	}
 		#vsTitle{
 			margin:20px; 0px; 0px;
 			text-align:center;
