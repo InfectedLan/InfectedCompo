@@ -72,7 +72,7 @@ class Site {
 				                echo '<p id="addTeam"><span style="font-size:20px; margin-top:-15px;">+</span> Add Team</p>';
 				            echo '</div>';
 				            echo '<div id="chatBox">';
-				            echo '<div class="boxTitle"><p class="boxTitleText">Chat</p></div>';
+				            echo '<div class="boxTitle"><p class="boxTitleText">Chat - Global</p></div>';
 				            echo '<div id="chatContainer"></div>';
 				            echo '</div>';
 				        echo '</div>';

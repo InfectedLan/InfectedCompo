@@ -94,7 +94,7 @@ function matchWatchdog() {
   	});
 }
 function appendChat(matchData) {
-	$("#mainContent").append('<div id="compoChatField"></div>');
+	$("#mainContent").append('<h3>Chat - Match (Her kan alle chatte)</h3><div id="compoChatField"></div>');
 	createChat("compoChatField", matchData.chatId, 300);
 }
 function hasAccepted(data) {
