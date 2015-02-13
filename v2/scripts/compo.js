@@ -74,22 +74,20 @@ function disableMatchWatchdog() {
 function matchWatchdog() {
 	$.getJSON('../api/json/match/getMatchStatus.php?id=' + matchId, function(data){
 		if(data.result == true) {
-			if(data.matchData.state != lastMatchState) {
-				if(data.matchData.state == 0) {
-					handleAcceptState(data);
-				} else if(data.matchData.state == 1) {
-					handleCustomState(data);
-				} else if(data.matchData.state == 2) {
-					handlePlayState(data);
-				} else {
-					error("Unknown state: " + data.matchData.state);
-				}
-				if(currentPage == "match") {
-					appendChat(data.matchData);
-				}
-
-				lastMatchState = data.matchData.state;
+			if(data.matchData.state == 0) {
+				handleAcceptState(data);
+			} else if(data.matchData.state == 1) {
+				handleCustomState(data);
+			} else if(data.matchData.state == 2) {
+				handlePlayState(data);
+			} else {
+				error("Unknown state: " + data.matchData.state);
 			}
+			if(currentPage == "match") {
+				appendChat(data.matchData);
+			}
+
+			lastMatchState = data.matchData.state;
 		} else {
 			error(data.message);
 		}
@@ -249,7 +247,7 @@ function handlePlayState(data) {
 			var matchData = [];
 
 			matchData.push('<div class="playScreen">');
-            	matchData.push('<div style="position:relative; overflow:auto; height:200px;">');
+            	matchData.push('<div style="position:relative; overflow:hidden; height:200px;">');
                     matchData.push('<div style="float:left; position:relative; width:50%; height:100%;">');
                     	matchData.push('<p style="float:right; position:absolute; bottom:0; right:20px; font-size:30px; margin-bottom:0px;">Map: ' + data.matchData.gameData.mapData.name + ' </p>');
                     matchData.push('</div>');
@@ -259,9 +257,10 @@ function handlePlayState(data) {
                         matchData.push('</div>');
                     matchData.push('</div>');
                 matchData.push('</div>');
-            	matchData.push('<br>');
+            	matchData.push('<br />');
             	matchData.push('<p id="startGameBtn" class="acpt acptLarge go">PLAY</p>');
-                matchData.push('<p style="text-align: center;">Eller skriv i konsollen: <i>connect ' + data.matchData.gameData.connectDetails + '</i></p>');
+                matchData.push('<h4 style="text-align: center;">NB: Har du Windows 8 er du NØDT til å koble til med konsollen</h4>');
+                matchData.push('<p style="text-align: center;">Trykk play eller skriv i konsollen: <i>connect ' + data.matchData.gameData.connectDetails + '</i></p>');
                 //matchData.push('<p class="ippw">Hvert lag er nødt til å skrive !map de_' + data.matchData.gameData.mapData.name.toLowerCase() + ' når de kobler til</p>');
             matchData.push('</div>');
 			$("#mainContent").html(matchData.join(""));
@@ -275,7 +274,9 @@ function handlePlayState(data) {
 	}
 }
 function startGame(consoleData) {
-	window.location = 'steam://connect/' + encodeURIComponent(consoleData);
+	var connectUrl = 'steam://connect/' + consoleData.replace(";password ", "/");
+	console.log("Connecting to " + connectUrl);
+	window.location = connectUrl;
 }
 function banMap(mapId) {
 	$.getJSON('../api/json/match/banmap.php?id=' + encodeURIComponent(mapId) + '&matchId=' + matchId, function(data){

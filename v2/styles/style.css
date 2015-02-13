@@ -10,6 +10,14 @@
 	margin-top:10px;
 	}
 
+.voteScreen:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+
 /*.playScreen{
 	display:none;
 	}
