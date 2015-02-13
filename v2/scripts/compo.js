@@ -260,9 +260,9 @@ function handlePlayState(data) {
                     matchData.push('</div>');
                 matchData.push('</div>');
             	matchData.push('<br>');
-            	//matchData.push('<p id="startGameBtn" class="acpt acptLarge go">PLAY</p>');
-                matchData.push('<p style="text-align: center;">Skriv i konsollen: <i>' + data.matchData.gameData.connectDetails + '</i></p>');
-                matchData.push('<p class="ippw">Hvert lag er nødt til å skrive !map de_' + data.matchData.gameData.mapData.name.toLowerCase() + ' når de kobler til</p>');
+            	matchData.push('<p id="startGameBtn" class="acpt acptLarge go">PLAY</p>');
+                matchData.push('<p style="text-align: center;">Eller skriv i konsollen: <i>connect ' + data.matchData.gameData.connectDetails + '</i></p>');
+                //matchData.push('<p class="ippw">Hvert lag er nødt til å skrive !map de_' + data.matchData.gameData.mapData.name.toLowerCase() + ' når de kobler til</p>');
             matchData.push('</div>');
 			$("#mainContent").html(matchData.join(""));
 			$("#startGameBtn").click({consoleData: data.matchData.gameData.connectDetails}, function(e) {
@@ -275,7 +275,7 @@ function handlePlayState(data) {
 	}
 }
 function startGame(consoleData) {
-	window.location = 'steam://rungameid/730//' + encodeURIComponent(consoleData);
+	window.location = 'steam://connect/' + encodeURIComponent(consoleData);
 }
 function banMap(mapId) {
 	$.getJSON('../api/json/match/banmap.php?id=' + encodeURIComponent(mapId) + '&matchId=' + matchId, function(data){
