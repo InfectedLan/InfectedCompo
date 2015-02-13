@@ -81,12 +81,40 @@ h3 {
 	font-weight: normal;
 }
 
+#logOutLabel {
+	color: #FFF !important;
+	position: absolute;
+	width: 70px;
+	right: -12px;
+	top: 35px;
+	font-size: 90%;
+	text-decoration: none;
+}
+
+a {
+	color: #FFF !important;
+}
+
+.boxTitle {
+	width: 100%;
+	height: 40px;
+	background-color: #041724;
+}
+
+.boxTitle p {
+	padding: 10px;
+} 
+
+.boxTitleText {
+
+}
+
 #loginInput {
 
 }
 
 #loginbox i {
-	margin: 4px;
+	margin: 4px, 10px, 4px, 4px;
 }
 
 #loginbox {
@@ -177,7 +205,7 @@ h3 {
 			}
 	#chatBox{
 		height:455px;	
-		margin-top:20px;
+		/* margin-top:20px; */
 	}
 	#Box{
 		margin-top:15px;
