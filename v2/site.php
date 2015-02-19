@@ -1,7 +1,6 @@
 <?php
 require_once 'session.php';
 require_once 'settings.php';
-require_once 'utils.php';
 require_once 'handlers/eventhandler.php';
 require_once 'handlers/tickethandler.php';
 require_once 'handlers/matchhandler.php';
@@ -92,7 +91,9 @@ class Site {
 					                	echo '<div id="gameBannerLoL" class="gameType" style="width:70px;"><p>LoL</p></div>';
 					            	}
 					            }
-				                $match = MatchHandler::getMatchForUser($user, $event);
+
+				                $match = MatchHandler::getMatchByUser($user, $event);
+				                
 				                if(isset($match)) {
 				                	if(isset($_GET['page']) && $_GET['page'] == "match") {
 				                		echo '<div id="gameBannerCurrentMatch" class="gameType selected" style="width:170px;"><p>Current Match</p></div>';	
