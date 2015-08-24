@@ -40,6 +40,7 @@ class Site {
 
 				//Custom javascripts. This HAS to be included after jquery
 				echo '<script src="scripts/shared.js"></script>';
+
                 if(Session::isAuthenticated()) {
                     echo '<script src="../api/scripts/chat.js"></script>';
                     echo '<script>Chat.init(); $(document).ready(function() {Chat.bindChat("chatContainer", 1, 415);});</script>';
