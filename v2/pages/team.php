@@ -19,6 +19,7 @@
  */
 
 require_once 'handlers/clanhandler.php';
+require_once 'handlers/invitehandler.php';
 require_once 'handlers/eventhandler.php';
 require_once 'session.php';
 class PageContent {
@@ -31,16 +32,24 @@ class PageContent {
 			//echo '<center>';
 				echo '<h1>' . $team->getName() . ' - ' . $team->getTag() . '</h1>';
 				echo '<br />';
-				$compo = ClanHandler::getCompo($team);
+				$compo = CompoHandler::getCompoByClan($team);
 				echo '<h3>' . $compo->getName() . '</h3>';
 
-			$playingMembers = ClanHandler::getPlayingMembers($team);
-			$stepinMembers = ClanHandler::getStepinMembers($team);
+			$playingMembers = ClanHandler::getPlayingClanMembers($team);
+			$stepinMembers = ClanHandler::getStepInClanMembers($team);
 			//echo '</center>';
-			if($team->getChief() == $user->getId()) {
-				if(count($playingMembers) != $compo->getTeamSize()) {
-					echo '<br /><b>ADVARSEL: Laget er ikke fullt, og vil ikke være kvalifisert til compoen før det er fullt!</b>';
-				}
+			if($team->getChief() == $user) {
+                if(ClanHandler::isQualified($team, $compo)) {
+                    echo "<br /><b>Laget ditt er kvalifisert til å spille i konkurransen</b>";
+                } else {
+                    if(count($playingMembers) != $compo->getTeamSize()) {
+                        echo '<br /><b>ADVARSEL: Laget er ikke fullt, og vil ikke være kvalifisert til compoen før det er fullt!</b>';
+                    } else {
+                        if($compo->getParticipantLimit() != 0) {
+                            echo "<br /><b>Beklager, men ditt lag ble ikke fullt før alle plassene var tatt!</b>";
+                        }
+                    }
+                }
 			}
 
 
@@ -52,7 +61,7 @@ class PageContent {
 			echo '<table>';
 				foreach ($playingMembers as $member) {
 					echo '<tr>';
-						if($user->getId() == $team->getChief()) { //Are we a chief?
+                    if($user == $team->getChief()) { //Are we a chief?
 							if($member->getId() != $team->getChief()) { //Only show kick button if this isnt us
 								echo '<td>' . $member->getDisplayName() . '</td><td><input type="button" value="Set as stepin" onclick="setAsStepinPlayer(' . $member->getId() . ', ' . $team->getId() . ')" /></td><td><input type="button" value="Kick" onclick="kickUser(' . $member->getId() . ', ' . $team->getId() . ')" /></td>';
 							} else {
@@ -71,7 +80,7 @@ class PageContent {
 				echo '<table>';
 					foreach ($stepinMembers as $member) {
 						echo '<tr>';
-							if($user->getId() == $team->getChief()) { //Are we a chief?
+							if($user == $team->getChief()) { //Are we a chief?
 								if($member->getId() != $team->getChief()) { //Only show kick button if this isnt us
 									echo '<td>' . $member->getDisplayName() . '</td><td><input type="button" value="Set as primary player" onclick="setAsPrimaryPlayer(' . $member->getId() . ', ' . $team->getId() . ')" /></td><td><input type="button" value="Kick" onclick="kickUser(' . $member->getId() . ', ' . $team->getId() . ')" /></td>';
 								} else {
@@ -88,20 +97,20 @@ class PageContent {
 			echo '<h1>Inviterte medlemmer</h1>';
 			echo '<br />';
 			echo '<table>';
-				$invites = ClanHandler::getInvites($team);
+				$invites = InviteHandler::getInvitesByClan($team);
 				foreach($invites as $invite) {
 					echo '<tr>';
 						echo '<td>';
-							if($team->getChief() == $user->getId()) {
-								echo UserHandler::getUser($invite->getUserId())->getDisplayName() . '<input type="button" value="Slett invite" onClick="deleteInvite(' . $invite->getId() . ')" />';
+							if($team->getChief() == $user) {
+								echo UserHandler::getUser($invite->getUser()->getId())->getDisplayName() . '<input type="button" value="Slett invite" onClick="deleteInvite(' . $invite->getId() . ')" />';
 							} else {
-								echo UserHandler::getUser($invite->getUserId())->getDisplayName();
+								echo UserHandler::getUser($invite->getUser()->getId())->getDisplayName();
 							}
 						echo '</td>';
 					echo '</tr>';
 				}
 			echo '</table>';
-			if($team->getChief() == $user->getId()) {
+			if($team->getChief() == $user) {
 				echo 'Invite teammates: <input id="inviteSearchBox" type="text" />';
 				echo '<br />';
 				echo '<div id="searchResultsResultPane">';

@@ -106,8 +106,8 @@ class Site {
 					                echo '<div id="gameBannerLoL" class="gameType" style="width:70px;"><p>LoL</p></div>';
 					            } else {
 					            	if($_GET['page']=="compo") {
-					            		echo '<div id="gameBannerCsGo" class="gameType' .  ($_GET['id'] == "3" ? ' selected' : ''). '" style="width:100px;"><p>CS:GO</p></div>';
-					                	echo '<div id="gameBannerLoL" class="gameType' .  ($_GET['id'] == "4" ? ' selected' : ''). '" style="width:70px;"><p>LoL</p></div>';
+					            		echo '<div id="gameBannerCsGo" class="gameType' .  ($_GET['id'] == "5" ? ' selected' : ''). '" style="width:100px;"><p>CS:GO</p></div>';
+					                	echo '<div id="gameBannerLoL" class="gameType' .  ($_GET['id'] == "6" ? ' selected' : ''). '" style="width:70px;"><p>LoL</p></div>';
 					            	} else {
 					            		echo '<div id="gameBannerCsGo" class="gameType" style="width:100px;"><p>CS:GO</p></div>';
 					                	echo '<div id="gameBannerLoL" class="gameType" style="width:70px;"><p>LoL</p></div>';

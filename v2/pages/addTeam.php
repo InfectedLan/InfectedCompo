@@ -51,7 +51,7 @@ class PageContent {
 							echo '</td>';
 							echo '<td>';
 								echo '<select id="compoSelect">';
-									$compos = CompoHandler::getComposForEvent($currEvent);
+									$compos = CompoHandler::getComposByEvent($currEvent);
 									foreach ($compos as $compo) {
 										echo '<option value="' . $compo->getId() . '">' . $compo->getName() . '</option>';
 									}

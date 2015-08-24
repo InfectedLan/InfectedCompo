@@ -35,7 +35,7 @@ class PageContent {
 			}
 			echo '<br />';
 			//Get list of teams
-			$teams = CompoHandler::getClans($compo);
+			$teams = ClanHandler::getClansByCompo($compo);
 			//Count stats
 			$numQualified = 0;
 			foreach($teams as $clan) {
@@ -43,7 +43,11 @@ class PageContent {
 					$numQualified++;
 				}
 			}
-			echo '<h3>Fullstendige lag:</h3>';
+            if($compo->getParticipantLimit() != 0) {
+                echo '<h3>Kvalifiserte lag(' . $numQualified . ' av ' . $compo->getParticipantLimit() . '):</h3>';
+            } else {
+                echo '<h3>Kvalifiserte lag:</h3>';
+            }
 			echo '<br />';
 			echo '<br />';
 			if($numQualified==0) {
@@ -59,7 +63,7 @@ class PageContent {
 			echo '</ul>';
 			if(count($teams) != $numQualified) {
 				echo '<br />';
-				echo '<h3>Ufullstendige lag:</h3>';
+				echo '<h3>Ukvalifiserte lag:</h3>';
 				echo '<br />';
 				echo '<ul>';
 					foreach($teams as $clan) {
