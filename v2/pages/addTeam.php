@@ -50,7 +50,9 @@ class PageContent {
 							echo '</td>';
 							echo '<td>';
 								echo '<select id="compoSelect">';
+
 									$compos = CompoHandler::getCompos();
+
 									foreach ($compos as $compo) {
 										echo '<option value="' . $compo->getId() . '">' . $compo->getName() . '</option>';
 									}
@@ -59,10 +61,13 @@ class PageContent {
 								echo '<script>';
 									echo 'var compoTeamSizes = [';
 									$a = false;
+
 									foreach ($compos as $compo) {
 										echo ($a == true ? ', ' : '') . $compo->getTeamSize();
+
 										$a = true;
 									}
+
 									echo '];';
 								echo '</script>';
 							echo '</td>';
