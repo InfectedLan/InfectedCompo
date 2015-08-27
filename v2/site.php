@@ -8,12 +8,12 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -37,6 +37,8 @@ class Site {
 				echo '<link href="../api/styles/jquery-ui-1.11.1.css" rel="stylesheet" type="text/css" />';
 				echo '<script src="../api/scripts/jquery-1.11.1.min.js"></script>';
 				echo '<script src="../api/scripts/jquery-ui-1.11.1.min.js"></script>';
+				echo '<script src="../api/scripts/login.js"></script>';
+				echo '<script src="../api/scripts/logout.js"></script>';
 
 				//Custom javascripts. This HAS to be included after jquery
 				echo '<script src="scripts/shared.js"></script>';
@@ -55,11 +57,12 @@ class Site {
 				echo '<span id="errorMsg">Placeholder error message here...</span>';
 				echo '<div class="errorClose">Lukk</div>';
 			echo '</div>';
-				if(Session::isAuthenticated())
-				{
+				if(Session::isAuthenticated()) {
 					echo '<script src="scripts/compo.js"></script>';
+
 					$user = Session::getCurrentUser();
 					$event = EventHandler::getCurrentEvent();
+
 					echo '<script>';
 						echo 'var myUserId = ' . $user->getId() . ';';
 						echo 'var currentPage = "' . ( isset($_GET['page']) ? htmlentities($_GET['page'], ENT_QUOTES, 'UTF-8') : "none" ) . '";';
@@ -69,20 +72,21 @@ class Site {
 				            echo '<div id="profileBox">';
 				            	echo '<div id="userProfilePic">';
 				            		//Get avatar data
+												$avatarFile = null;
 
-									$avatarFile = null;
-									
-									if ($user->hasValidAvatar()) {
-										$avatarFile = $user->getAvatar()->getThumbnail();
-									} else {
-										$avatarFile = AvatarHandler::getDefaultAvatar($user);
-									}
+												if ($user->hasValidAvatar()) {
+													$avatarFile = $user->getAvatar()->getThumbnail();
+												} else {
+													$avatarFile = AvatarHandler::getDefaultAvatar($user);
+												}
 				                	echo '<img src="../api/' . $avatarFile . '"></img>';
 				                echo '</div>';
 				                echo '<div id="userName">';
 				                	echo '<p>' . $user->getCompoDisplayName() . '</p>';
 				                echo '</div>';
 				                echo '<div>';
+
+													echo '<a id="editUserLabel" href="javascript:editUser()">Endre profil</a>';
 				                	echo '<a id="logOutLabel" href="javascript:logout()">Logg ut</a>';
 				                echo '</div>';
 				            echo '</div>';
@@ -115,36 +119,32 @@ class Site {
 					            }
 
 				                $match = MatchHandler::getMatchByUser($user, $event);
-				                
+
 				                if(isset($match)) {
 				                	if(isset($_GET['page']) && $_GET['page'] == "match") {
-				                		echo '<div id="gameBannerCurrentMatch" class="gameType selected" style="width:170px;"><p>Current Match</p></div>';	
+				                		echo '<div id="gameBannerCurrentMatch" class="gameType selected" style="width:170px;"><p>Current Match</p></div>';
 				                	} else {
-				                		echo '<div id="gameBannerCurrentMatch" class="gameType" style="width:170px;"><p>Current Match</p></div>';	
+				                		echo '<div id="gameBannerCurrentMatch" class="gameType" style="width:170px;"><p>Current Match</p></div>';
 				                	}
 				                	echo '<div id="bannerFiller"></div>';
 				                } else {
 				                	echo '<div id="bannerFiller2"></div>';
 				                }
 				                //
-				                
+
 				            echo '</div>';
 				            echo '<div id="mainContent">';
-				                if( isset($_GET['page'] ) && $this->viewPage($_GET['page']) )	
-				                {
-				                	$pageContent = new PageContent();
-				                	$pageContent->render();
-				                }	
-				                else
-				                {
-				                	echo '<h1>Velkommen til infected compo!</h1>';
-				                }		                
+
+											if (isset($_GET['page'])) {
+												$this->viewPage($_GET['page']);
+											} else {
+												echo '<h1>Velkommen til infected compo!</h1>';
+											}
+
 				            echo '</div>';
 				        echo '</div>';
 				    echo '</div>';
-				}
-				else
-				{
+				} else {
 					echo '<div id="loginbox">';
 						echo '<script src="../api/scripts/login.js"></script>';
 						echo '<form class="login" method="post">';
@@ -155,7 +155,7 @@ class Site {
 								echo '<li>';
 									echo '<input class="input" name="password" type="password" placeholder="Passord">';
 								echo '</li>';
-								
+
 								echo '<li>';
 									echo '<input class="button" id="submit" name="submit" type="submit" value="Logg inn">';
 								echo '</li>';
@@ -168,37 +168,35 @@ class Site {
 			echo '</body>';
 		echo '</html>';
 	}
-	
+
 	// Generates title.
 	private function getTitle() {
 		return Settings::name . ' Compo';
 	}
-	
+
 	private function viewPage($pageName) {
-		$directoryList = array('pages');
+		$directoryList = array(Settings::api_path . 'pages',
+							   'pages');
 		$includedPages = array();
 		$found = false;
-		
+
 		foreach ($directoryList as $directory) {
 			$filePath = $directory . '/' . $pageName . '.php';
-		
+
 			if (!in_array($pageName, $includedPages) &&
 				in_array($filePath, glob($directory . '/*.php'))) {
-				// Make sure we don't include pages with same name twice, 
+				// Make sure we don't include pages with same name twice,
 				// and set the found varialbe so that we don't have to display the not found message.
 				array_push($includedPages, $pageName);
 				$found = true;
-			
+
 				include_once $filePath;
 			}
 		}
-		/*
+
 		if (!$found) {
-			echo '<article>';
-				echo '<h1>Siden ble ikke funnet!</h1>';
-			echo '</article>';
-		}*/
-		return $found;
+			echo '<h1>Siden ble ikke funnet!</h1>';
+		}
 	}
 }
 ?>

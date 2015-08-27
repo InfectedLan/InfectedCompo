@@ -7,12 +7,12 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -65,19 +65,10 @@ function showInfoBox() {
 	$("#errorbox").fadeIn(200);
 	$('#errorbox').attr("class", "info");
 }
-$(document).ready(function() {	
+$(document).ready(function() {
 	$('.errorClose').click(function() {
 		hideErrorBox();
 		errorFunction();
 	});
 });
 var errorFunction = 0;
-function logout() {
-	$.getJSON('../api/json/session/logout.php', function(data){
-		if(data.result == true) {
-			location.reload();
-		} else {
-			error(data.message);
-		}
-  	});
-}

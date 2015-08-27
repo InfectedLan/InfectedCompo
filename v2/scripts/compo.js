@@ -7,12 +7,12 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -30,10 +30,10 @@ $(document).ready(function() {
 	});
 	compoStatusUpdateId = setInterval(updateCompoStatus, 15000);
 	updateCompoStatus();
-	$("#gameBannerCsGo").click(function(e) { 
+	$("#gameBannerCsGo").click(function(e) {
 		window.location = "index.php?page=compo&id=5";
 	});
-	$("#gameBannerLoL").click(function(e) { 
+	$("#gameBannerLoL").click(function(e) {
 		window.location = "index.php?page=compo&id=6";
 	});
 	$("#gameBannerCurrentMatch").click(function(e) {
@@ -131,7 +131,7 @@ function hasAccepted(data) {
 }
 //Funuctions for states
 function handleAcceptState(data) {
-	
+
 	if(currentPage == "match") {
 		var acceptScreenLayout = [];
 		acceptScreenLayout.push('<br /><br />');
@@ -182,8 +182,8 @@ function handleAcceptState(data) {
 	} else {
 		if(!hasAccepted(data)) {
 			$("#teamData").html("<center><h1 style='top: -10px;'>Game ready</h1></center><p id='smallAccept' class='acpt acptSmall'>ACCEPT</p>");
-			$("#addTeam").remove();	
-			$("#smallAccept").click(/*{matchId: data.matchData.id}, */function(e) { 
+			$("#addTeam").remove();
+			$("#smallAccept").click(/*{matchId: data.matchData.id}, */function(e) {
 				//acceptMatch(e.data.matchId);
 				acceptMatch(matchId);
 			});
@@ -309,7 +309,7 @@ function banMap(mapId) {
 function acceptMatch(id) {
 	$.getJSON('../api/json/match/acceptMatch.php?id=' + encodeURIComponent(id), function(data){
 		if(data.result) {
-			window.location = "index.php?page=match";	
+			window.location = "index.php?page=match";
 		} else {
 			error(data.message);
 		}
@@ -332,4 +332,8 @@ function declineInvite(inviteId) {
 			error(data.message);
 		}
 	});
+}
+
+function editUser() {
+	$(location).attr('href', 'index.php?page=edit-profile');
 }
