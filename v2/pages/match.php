@@ -22,5 +22,9 @@ require_once 'session.php';
 require_once 'handlers/compohandler.php';
 require_once 'handlers/eventhandler.php';
 
-$user = Session::getCurrentUser();
+class PageContent {
+    public function render() {
+        $user = Session::getCurrentUser();
+    }
+}
 ?>
