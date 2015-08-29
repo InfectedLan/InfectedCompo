@@ -45,20 +45,20 @@ if (isset($_GET['id']) &&
 	//echo '</center>';
 
 	if ($team->getChief() == $user) {
-    if (ClanHandler::isQualified($team, $compo)) {
-      echo '<br /><b>Laget ditt er kvalifisert til å spille i konkurransen</b>';
-    } else {
-      if (count($playingMembers) != $compo->getTeamSize()) {
-        echo '<br /><b>ADVARSEL: Laget er ikke fullt, og vil ikke være kvalifisert til compoen før det er fullt!</b>';
-      } else {
-        if ($compo->getParticipantLimit() != 0) {
-          echo "<br /><b>Beklager, men ditt lag ble ikke fullt før alle plassene var tatt!</b>";
+        if (ClanHandler::isQualified($team, $compo)) {
+            echo '<br /><b>Laget ditt er kvalifisert til å spille i konkurransen</b>';
+        } else {
+            if (count($playingMembers) != $compo->getTeamSize()) {
+                echo '<br /><b>ADVARSEL: Laget er ikke fullt, og vil ikke være kvalifisert til compoen før det er fullt!</b>';
+            } else {
+                if ($compo->getParticipantLimit() != 0) {
+                    echo "<br /><b>Beklager, men ditt lag ble ikke fullt før alle plassene var tatt!</b>";
+                }
+            }
         }
-      }
-    }
 	}
-
-
+    echo '</table>';
+    echo '<br />';
 	echo '<br />';
 	echo '<br />';
 
@@ -66,19 +66,19 @@ if (isset($_GET['id']) &&
 	echo '<br />';
 	echo '<table>';
 
-		foreach ($playingMembers as $member) {
-			echo '<tr>';
+    foreach ($playingMembers as $member) {
+        echo '<tr>';
       	if ($user == $team->getChief()) { //Are we a chief?
-					if ($member->getId() != $team->getChief()) { //Only show kick button if this isnt us
-						echo '<td>' . $member->getCompoDisplayName() . '</td><td><input type="button" value="Set as stepin" onclick="setAsStepinPlayer(' . $member->getId() . ', ' . $team->getId() . ')" /></td><td><input type="button" value="Kick" onclick="kickUser(' . $member->getId() . ', ' . $team->getId() . ')" /></td>';
-					} else {
-						echo '<td>' . $member->getCompoDisplayName() . '</td><td><input type="button" value="Set as stepin" onclick="setAsStepinPlayer(' . $member->getId() . ', ' . $team->getId() . ')" /></td>';
-					}
-				} else {
-					echo '<td>' . $member->getCompoDisplayName() . '</td>';
-				}
-			echo '</tr>';
-		}
+            if ($member->getId() != $team->getChief()) { //Only show kick button if this isnt us
+                echo '<td>' . $member->getCompoDisplayName() . '</td><td><input type="button" value="Set as stepin" onclick="setAsStepinPlayer(' . $member->getId() . ', ' . $team->getId() . ')" /></td><td><input type="button" value="Kick" onclick="kickUser(' . $member->getId() . ', ' . $team->getId() . ')" /></td>';
+            } else {
+                echo '<td>' . $member->getCompoDisplayName() . '</td><td><input type="button" value="Set as stepin" onclick="setAsStepinPlayer(' . $member->getId() . ', ' . $team->getId() . ')" /></td>';
+            }
+        } else {
+            echo '<td>' . $member->getCompoDisplayName() . '</td>';
+        }
+        echo '</tr>';
+    }
 
 	echo '</table>';
 	echo '<br />';
@@ -88,53 +88,52 @@ if (isset($_GET['id']) &&
 		echo '<br />';
 		echo '<table>';
 
-			foreach ($stepinMembers as $member) {
-				echo '<tr>';
+        foreach ($stepinMembers as $member) {
+            echo '<tr>';
+            if ($user == $team->getChief()) { //Are we a chief?
+                if ($member->getId() != $team->getChief()) { //Only show kick button if this isnt us
+                    echo '<td>' . $member->getCompoDisplayName() . '</td><td><input type="button" value="Set as primary player" onclick="setAsPrimaryPlayer(' . $member->getId() . ', ' . $team->getId() . ')" /></td><td><input type="button" value="Kick" onclick="kickUser(' . $member->getId() . ', ' . $team->getId() . ')" /></td>';
+                } else {
+                    echo '<td>' . $member->getCompoDisplayName() . '</td><td><input type="button" value="Set as primary player" onclick="setAsPrimaryPlayer(' . $member->getId() . ', ' . $team->getId() . ')" /></td>';
+                }
+            } else {
+                echo '<td>' . $member->getCompoDisplayName() . '</td>';
+            }
+            echo '</tr>';
+        }
+        echo '</table>';
+        echo '<br />';
+    }
 
-					if ($user == $team->getChief()) { //Are we a chief?
-						if ($member->getId() != $team->getChief()) { //Only show kick button if this isnt us
-							echo '<td>' . $member->getCompoDisplayName() . '</td><td><input type="button" value="Set as primary player" onclick="setAsPrimaryPlayer(' . $member->getId() . ', ' . $team->getId() . ')" /></td><td><input type="button" value="Kick" onclick="kickUser(' . $member->getId() . ', ' . $team->getId() . ')" /></td>';
-						} else {
-							echo '<td>' . $member->getCompoDisplayName() . '</td><td><input type="button" value="Set as primary player" onclick="setAsPrimaryPlayer(' . $member->getId() . ', ' . $team->getId() . ')" /></td>';
-						}
-					} else {
-						echo '<td>' . $member->getCompoDisplayName() . '</td>';
-					}
-				echo '</tr>';
-			}
-		echo '</table>';
-		echo '<br />';
-	}
+    echo '<h1>Inviterte medlemmer</h1>';
+    echo '<br />';
+    echo '<table>';
 
-	echo '<h1>Inviterte medlemmer</h1>';
-	echo '<br />';
-	echo '<table>';
+    $inviteList = InviteHandler::getInvitesByClan($team);
 
-		$inviteList = InviteHandler::getInvitesByClan($team);
+    foreach ($inviteList as $invite) {
+        echo '<tr>';
+        echo '<td>';
 
-		foreach ($inviteList as $invite) {
-			echo '<tr>';
-				echo '<td>';
+        if ($team->getChief() == $user) {
+            echo UserHandler::getUser($invite->getUser()->getId())->getCompoDisplayName() . '<input type="button" value="Slett invite" onClick="deleteInvite(' . $invite->getId() . ')" />';
+        } else {
+            echo UserHandler::getUser($invite->getUser()->getId())->getCompoDisplayName();
+        }
 
-					if ($team->getChief() == $user) {
-						echo UserHandler::getUser($invite->getUser()->getId())->getCompoDisplayName() . '<input type="button" value="Slett invite" onClick="deleteInvite(' . $invite->getId() . ')" />';
-					} else {
-						echo UserHandler::getUser($invite->getUser()->getId())->getCompoDisplayName();
-					}
+        echo '</td>';
+        echo '</tr>';
+    }
+    echo '</table>';
 
-				echo '</td>';
-			echo '</tr>';
-		}
-	echo '</table>';
+    if ($team->getChief() == $user) {
+        echo 'Invite teammates: <input id="inviteSearchBox" type="text" />';
+        echo '<br />';
+        echo '<div id="searchResultsResultPane">';
 
-	if ($team->getChief() == $user) {
-		echo 'Invite teammates: <input id="inviteSearchBox" type="text" />';
-		echo '<br />';
-		echo '<div id="searchResultsResultPane">';
-
-		echo '</div>';
-	}
+        echo '</div>';
+    }
 } else {
-	echo '<h1>Laget finnes ikke!</h1>';
+    echo '<h1>Laget finnes ikke!</h1>';
 }
 ?>
