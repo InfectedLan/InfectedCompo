@@ -35,7 +35,7 @@ class Site {
 			    echo '<link rel="stylesheet" type="text/css" href="../api/styles/bracket.css">';
 			    echo '<link rel="stylesheet" type="text/css" href="../api/styles/chat.css">';
 				echo '<link href="../api/styles/jquery-ui-1.11.1.css" rel="stylesheet" type="text/css" />';
-				echo '<script src="../api/scripts/jquery-1.11.1.min.js"></script>';
+				echo '<script src="../api/scripts/jquery-1.11.3.min.js"></script>';
 				echo '<script src="../api/scripts/jquery-ui-1.11.1.min.js"></script>';
 				echo '<script src="../api/scripts/login.js"></script>';
 				echo '<script src="../api/scripts/logout.js"></script>';
