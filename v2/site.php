@@ -175,8 +175,8 @@ class Site {
 	}
 
 	private function viewPage($pageName) {
-		$directoryList = array(Settings::api_path . 'pages',
-							   'pages');
+		$directoryList = [Settings::api_path . 'pages',
+							   			'pages'];
 		$includedPages = [];
 		$found = false;
 
@@ -187,7 +187,7 @@ class Site {
 				in_array($filePath, glob($directory . '/*.php'))) {
 				// Make sure we don't include pages with same name twice,
 				// and set the found varialbe so that we don't have to display the not found message.
-				array_push($includedPages, $pageName);
+			  $includedPages[] = $pageName;
 				$found = true;
 
 				include_once $filePath;
