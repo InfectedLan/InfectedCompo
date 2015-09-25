@@ -42,12 +42,12 @@ class Site {
 
 				//Custom javascripts. This HAS to be included after jquery
 				echo '<script src="scripts/shared.js"></script>';
-                /*
+                
                 if(Session::isAuthenticated()) {
                     echo '<script src="../api/scripts/chat.js"></script>';
-                    echo '<script>Chat.init(); $(document).ready(function() {Chat.bindChat("chatContainer", 1, 415);});</script>';
+                    echo '<script>Chat.init();</script>';
                 }
-                */
+                
 				echo "<script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create', 'UA-54254513-4', 'auto');ga('send', 'pageview');</script>";
 			echo '</head>';
 
@@ -98,9 +98,18 @@ class Site {
 				                echo '<p id="addTeam"><span style="font-size:20px; margin-top:-15px;">+</span> Add Team</p>';
 				            echo '</div>';
 				            echo '<div id="chatBox">';
-				            echo '<div class="boxTitle"><p class="boxTitleText">Chat - Global</p></div>';
+                            $clans = ClanHandler::getClansByUser($user);
+                            foreach($clans as $clan) {
+                                if(ClanHandler::isQualified($clan, $clan->getCompo())) {
+                                    $compo = $clan->getCompo();
+                                    echo '<div class="boxTitle"><p class="boxTitleText">Chat - ' . $compo->getName() . '</p></div>';
+                                    break;
+                                }
+                            }
 				            echo '<div id="chatContainer"></div>';
 				            echo '</div>';
+                            
+                            echo '<script>$(document).ready(function() {Chat.bindChat("chatContainer", ' . $compo->getChat()->getId() . ', 415);});</script>';
 				        echo '</div>';
 				        echo '<div id="rightColumn">';
 				            echo '<div id="banner">';
