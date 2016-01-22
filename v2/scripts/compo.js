@@ -31,10 +31,10 @@ $(document).ready(function() {
 	compoStatusUpdateId = setInterval(updateCompoStatus, 15000);
 	updateCompoStatus();
 	$("#gameBannerCsGo").click(function(e) {
-		window.location = "index.php?page=compo&id=5";
+		window.location = "index.php?page=compo&id=7";
 	});
 	$("#gameBannerLoL").click(function(e) {
-		window.location = "index.php?page=compo&id=6";
+		window.location = "index.php?page=compo&id=8";
 	});
 	$("#gameBannerCurrentMatch").click(function(e) {
 		window.location = "index.php?page=match";
@@ -92,7 +92,7 @@ function disableMatchWatchdog() {
 
 function matchWatchdog() {
 	$.getJSON('../api/json/match/getMatchStatus.php?id=' + matchId, function(data){
-		if(data.result == true) {
+	    if(data.result == true) {
 			if(data.matchData.state == 0) {
 				handleAcceptState(data);
 			} else if(data.matchData.state == 1) {
@@ -105,16 +105,21 @@ function matchWatchdog() {
 			if(currentPage == "match") {
 				appendChat(data.matchData);
 			}
-
+		
 			lastMatchState = data.matchData.state;
 		} else {
 			error(data.message);
 		}
   	});
 }
+var lastChatId = -1;
 function appendChat(matchData) {
-	$("#mainContent").append('<h3>Chat - Match (Her kan alle chatte)</h3><div id="compoChatField"></div>');
-	createChat("compoChatField", matchData.chatId, 300);
+    if(matchData.chatId != lastChatId) {
+	Chat.unbindChat("compoChatField");
+	$("#chatArea").html('<h3>Chat - Match (Her kan alle chatte)</h3><div id="compoChatField"></div>');
+	Chat.bindChat("compoChatField", matchData.chatId, 300);
+	lastChatId = matchData.chatId;
+    }
 }
 function hasAccepted(data) {
 	for(var i = 0; i < data.matchData.readyData.length; i++) {
@@ -174,7 +179,7 @@ function handleAcceptState(data) {
 			acceptScreenLayout.push('</div>');
 		acceptScreenLayout.push('</div>');
 
-		$("#mainContent").html(acceptScreenLayout.join(""));
+		$("#matchArea").html(acceptScreenLayout.join(""));
 
 		$("#matchAcceptBtn").click(function(e) {
 			acceptMatch(matchId);
@@ -236,7 +241,7 @@ function handleCustomState(data) {
 	        	banData.push('</div>');
 	        }
         banData.push('</div>');
-        $("#mainContent").html(banData.join(""));
+        $("#matchArea").html(banData.join(""));
         for(var i = 0; i < data.matchData.banData.options.length; i++) {
 	        	$("#banBoxId" + i).click({mapId: data.matchData.banData.options[i].id}, function(e) {
 	        		banMap(e.data.mapId);
@@ -253,7 +258,7 @@ function handleCustomState(data) {
 }
 function handlePlayState(data) {
 	if(currentPage == "match") {
-		if(data.matchData.compoId == 4) { //LoL
+		if(data.matchData.compoId == 6) { //LoL
 			var matchData = [];
 
 			matchData.push("<h1>Gamet er klart!</h1>");
@@ -261,8 +266,8 @@ function handlePlayState(data) {
 			matchData.push("<br />");
 			matchData.push("<i>Si ifra til game når dere er ferdige</i>");
 
-			$("#mainContent").html(matchData.join(""));
-		} else if(data.matchData.compoId == 3) { //CS:GO
+			$("#matchArea").html(matchData.join(""));
+		} else if(data.matchData.compoId == 5) { //CS:GO
 			var matchData = [];
 
 			matchData.push('<div class="playScreen">');
@@ -282,7 +287,7 @@ function handlePlayState(data) {
                 matchData.push('<p style="text-align: center;">Trykk play eller skriv i konsollen: <i>connect ' + data.matchData.gameData.connectDetails + '</i></p>');
                 //matchData.push('<p class="ippw">Hvert lag er nødt til å skrive !map de_' + data.matchData.gameData.mapData.name.toLowerCase() + ' når de kobler til</p>');
             matchData.push('</div>');
-			$("#mainContent").html(matchData.join(""));
+			$("#matchArea").html(matchData.join(""));
 			$("#startGameBtn").click({consoleData: data.matchData.gameData.connectDetails}, function(e) {
 				startGame(e.data.consoleData);
 			});
