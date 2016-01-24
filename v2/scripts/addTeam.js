@@ -16,19 +16,22 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-$(document).ready(function(){
+//Fancy dank clojure shit
+(function(){
+    $(document).ready(function(){
 	$('#inviteSearchBox').on('input', function(){
-		updateSearchField();
+	    updateSearchField();
 	});
 	$('#compoSelect').change(function() {
-		compoTeamSize = compoTeamSizes[$("#compoSelect option:selected").index()];
-		invitedUserId = [];
-		invitedUserNames = [];
-		updateInvitedList();
+	    compoTeamSize = compoTeamSizes[$("#compoSelect option:selected").index()];
+	    invitedUserId = [];
+	    invitedUserNames = [];
+	    updateInvitedList();
 	});
 	compoTeamSize = compoTeamSizes[0];
-});
+    });
+})();
+
 
 var invitedUserId = [];
 var invitedUserNames = [];

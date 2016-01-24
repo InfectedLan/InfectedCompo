@@ -6,6 +6,7 @@ var login_html = '<div id="loginbox"><script src="../api/scripts/login.js"></scr
 
 var sidebar_html = '<div id="content" style="display:none;"><div id="leftColumn"><div id="profileBox"><div id="userProfilePic"></div><div id="userName"></div><div><a id="editUserLabel" href="javascript:editUser()">Endre profil</a><a id="logOutLabel" href="javascript:logout()">Logg ut</a></div></div><div id="teamBox"><p style="position:absolute; top:-45px;">Teams</p><div id="teamData"><h3>Laster inn...</h3></div><p id="addTeam"><span style="font-size:20px; margin-top:-15px;">+</span> Add Team</p></div><div id="chatBox"><div id="chatContainer"></div></div></div><div id="rightColumn"><div id="banner"></div><div id="mainContent"></div></div></div>';
 
+var newTeam_html = '<script src="scripts/addTeam.js"> </script><h1>Lag team</h1><table><tr><td width="50%"><table><tr><td>Teamname:</td><td><input type="text" id="clanName" /></td></tr><tr><td>Teamtag:</td><td><input type="text" id="clanTag" /></td></tr><tr><td>Compo:</td><td><select id="compoSelect"></select></td></tr><tr><td><div id="addClanButtonWrapper"><input type="button" value="Lag klan!" onClick="registerClan()" /></div></td></tr></table></td><td width="50%">Invite teammates: <input id="inviteSearchBox" type="text" /><br /><div id="searchResultsResultPane"></div><br /><h3>Invited players:</h3><div id="invidedPlayers"></div></td></tr></table>';
 
 /******************************************************
  * Page master class
@@ -28,6 +29,9 @@ Page.prototype.onInit = function() {
 Page.prototype.onDeInit = function() {
     console.log("Goodbye!");
 };
+
+//If this is set, will load and manage a javascript module for this page. Please note that events should only be set on the page contents to avoid multiple events firing
+Page.prototype.javascriptModule = null;
 
 /******************************************************
  * Login page
@@ -76,6 +80,22 @@ CompoPage.prototype.render = function() {
     $("#mainContent").html("<h1>Compoer</h1>");
     return false;
 };
+
+/*****************************************************
+ * New team page
+ */
+
+var NewTeamPage = function() {
+    Page.call(this);
+};
+
+NewTeamPage.prototype = Object.create(Page.prototype);
+NewTeamPage.prototype.constructor = NewTeamPage;
+NewTeamPage.prototype.render = function() {
+    $("#mainContent").html(newTeam_html);
+    return false;
+};
+NewTeamPage.prototype.javascriptModule = "addTeam.js";
 
 /*****************************************************
  * Download manager
@@ -134,8 +154,10 @@ PageDownloadWaiter.prototype.success = function(task) {
  * Page bookkeeping
  */
 
-var pages = {index: new IndexPage(), compo: new CompoPage()};
+var pages = {index: new IndexPage(), compo: new CompoPage(), newTeam: new NewTeamPage()};
 var currentPage = "login";
+var userData = null;
+var compoData = null;
 
 //Startup
 console.log("Infected compo booting up!");
@@ -181,17 +203,31 @@ function gotoPage(hashId) {
 	currentPage = hashId;
 	console.log("Starting transfer to " + hashId);
 	pages[hashId].onInit();
-	pages[hashId].render();
+	var result = pages[hashId].render();
+	//We want to do the javascript before things are faded in
+	if(pages[hashId].javascriptModule != null) {
+	    $("#mainContent").append('<script src="' + pages[hashId].javascriptModule + '"></script>');
+	}
+	if(result) {
+	    $("#mainContent").fadeIn(300);
+	}
     } else {
 	pages[currentPage].onDeInit();
 	pages[hashId].onInit();
 	$("#mainContent").fadeOut(300, function(){
 	    currentPage = hashId;
-	    if(pages[hashId].render()) {
+	    var result = pages[hashId].render();
+	    //We want to do the javascript before things are faded in
+	    if(pages[hashId].javascriptModule != null) {
+		$("#mainContent").append('<script src="' + pages[hashId].javascriptModule + '"></script>');
+	    }
+	    if(result) {
 		$("#mainContent").fadeIn(300);
 	    }
+	    
 	});
     }
+    renderBanner(); //Update the banner selected state
 }
 
 function renderSidebar() {
@@ -200,26 +236,33 @@ function renderSidebar() {
 	console.log("Got user data: " + data);
 	$("#userProfilePic").html('<img src="' + data.data.avatar.thumb + '" />');
 	$("#userName").html('<p>' + data.data.displayName + '</p>');
+	userData = data.data;
     });
     var compoDataTask = new DownloadJsonTask("../api/json/compo/getCompos.php", function(data){
-	var currentCompoId = -1;
-	if(location.hash.substr(1).split("-")[0]=="compo") {
-	    currentCompoId = location.hash.substr(1).split("-")[1];
-	    console.log("Current compo id: " + currentCompoId);
-	}
-	for(var i = 0; i < data.data.length; i++) {
-	    $("#banner").append('<div id="compoBtn' + i + '" class="gameType ' + (data.data[i].id == currentCompoId ? ' selected' : '') + '"><p>' + data.data[i].tag + '</p></div>');
-	    var compo = data.data[i];
-	    $("#compoBtn"+i).click(function(){
-		window.location = "index.php#compo-"+compo.id;
-	    });
-	}
+	compoData = data.data;
+	renderBanner();
     });
     $("#addTeam").click(function() {
 	window.location = "index.php#newTeam";
     });
     var downloadManager = new PageDownloadWaiter([userDataTask, compoDataTask], "content");
     downloadManager.start();
+}
+
+function renderBanner() {
+    $("#banner").html("");
+    var currentCompoId = -1;
+    if(location.hash.substr(1).split("-")[0]=="compo") {
+	currentCompoId = location.hash.substr(1).split("-")[1];
+	console.log("Current compo id: " + currentCompoId);
+    }
+    for(var i = 0; i < compoData.length; i++) {
+	$("#banner").append('<div id="compoBtn' + i + '" class="gameType ' + (compoData[i].id == currentCompoId ? ' selected' : '') + '"><p>' + compoData[i].tag + '</p></div>');
+	var compo = compoData[i];
+	$("#compoBtn"+i).click({compo: compo}, function(event){
+	    window.location = "index.php#compo-"+event.data.compo.id;
+	});
+    }
 }
 
 function getQueryVariable(variable) {
