@@ -270,6 +270,7 @@ a {
 		.gameType{
 			float:left;
 			height:58px;
+			min-width: 100px;
 			padding-top:2px;
 			margin-right:15px;
 			-webkit-user-select: none; /* Chrome/Safari */

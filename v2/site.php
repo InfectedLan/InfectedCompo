@@ -37,6 +37,7 @@ class Site {
 	echo '<link href="../api/styles/jquery-ui-1.11.1.css" rel="stylesheet" type="text/css" />';
 	echo '<script src="../api/scripts/jquery-1.11.3.min.js"></script>';
 	echo '<script src="../api/scripts/jquery-ui-1.11.1.min.js"></script>';
+    echo '<script src="../api/scripts/jquery.ba-hashchange.min.js"></script>';
 	echo '<script src="../api/scripts/login.js"></script>';
 	echo '<script src="../api/scripts/logout.js"></script>';
 	echo '<script src="../api/scripts/three.min.js"></script>';
@@ -44,6 +45,8 @@ class Site {
 
 	//Custom javascripts. This HAS to be included after jquery
 	echo '<script src="scripts/shared.js"></script>';
+    echo '<script src="scripts/compo.js"></script>';
+    echo '<script>var loggedIn = ' . (Session::isAuthenticated() ? "true" : "false") . ';</script>';
 	//echo '<script src="scripts/background.js"></script>';
         /*
 	if(Session::isAuthenticated()) {
@@ -53,14 +56,15 @@ class Site {
 	*/      
 	echo "<script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create', 'UA-54254513-4', 'auto');ga('send', 'pageview');</script>";
 	echo '</head>';
-
 	echo '<body>';
-	echo '<div id="canvasHolder"></div>';
+	/*echo '<div id="canvasHolder"></div>';
 	echo '<div id="errorbox" class="error">';
 	echo '<div id="errorTitle">Driftsmelding</div>';
 	echo '<span id="errorMsg">Placeholder error message here...</span>';
 	echo '<div class="errorClose">Lukk</div>';
 	echo '</div>';
+    echo '<div id="content"></div>';*/
+    /*
 	if(Session::isAuthenticated()) {
 	    echo '<script src="scripts/compo.js"></script>';
 
@@ -102,7 +106,7 @@ class Site {
 	    echo '<p id="addTeam"><span style="font-size:20px; margin-top:-15px;">+</span> Add Team</p>';
 	    echo '</div>';
 	    echo '<div id="chatBox">';
-	    /*
+	    //
 	    $clans = ClanHandler::getClansByUser($user);
 	    foreach($clans as $clan) {
 		if(ClanHandler::isQualified($clan, $clan->getCompo())) {
@@ -112,7 +116,7 @@ class Site {
 		    break;
 		}
 	    }
-	    */
+	    //
 	    echo '<div id="chatContainer"></div>';
 	    echo '</div>';
                            
@@ -180,6 +184,7 @@ class Site {
 	    echo '<i>Du bruker samme bruker på composiden og ticketsiden</i>';
 	    echo '</div>';
 	}
+    */
 	echo '</body>';
 	echo '</html>';
     }

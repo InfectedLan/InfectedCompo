@@ -1,344 +1,235 @@
-/**
- * This file is part of InfectedCompo.
- *
- * Copyright (C) 2015 Infected <http://infected.no/>.
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+/******************************************************
+ * HTML
  */
 
-//Variables
-var compoStatusUpdateId = 0;
-var matchStatusUpdateId = 0;
-var matchId = 0;
-var lastMatchState = -1;
-var shouldRefreshTeamData = true;
-//JQuery event listeners
-$(document).ready(function() {
-	$("#addTeam").click(function(e) {
-		addTeam();
-	});
-	compoStatusUpdateId = setInterval(updateCompoStatus, 15000);
-	updateCompoStatus();
-	$("#gameBannerCsGo").click(function(e) {
-		window.location = "index.php?page=compo&id=7";
-	});
-	$("#gameBannerLoL").click(function(e) {
-		window.location = "index.php?page=compo&id=8";
-	});
-	$("#gameBannerCurrentMatch").click(function(e) {
-		window.location = "index.php?page=match";
-	});
+var login_html = '<div id="loginbox"><script src="../api/scripts/login.js"></script><form class="login" method="post"><ul><li><input class="input" type="text" name="identifier" placeholder="Brukernavn, E-post eller Telefon"></li><li><input class="input" name="password" type="password" placeholder="Passord"></li><li><input class="button" id="submit" name="submit" type="submit" value="Logg inn"></li></ul></form><br /><i>Du bruker samme bruker på composiden og ticketsiden</i></div>';
+
+var sidebar_html = '<div id="content" style="display:none;"><div id="leftColumn"><div id="profileBox"><div id="userProfilePic"></div><div id="userName"></div><div><a id="editUserLabel" href="javascript:editUser()">Endre profil</a><a id="logOutLabel" href="javascript:logout()">Logg ut</a></div></div><div id="teamBox"><p style="position:absolute; top:-45px;">Teams</p><div id="teamData"><h3>Laster inn...</h3></div><p id="addTeam"><span style="font-size:20px; margin-top:-15px;">+</span> Add Team</p></div><div id="chatBox"><div id="chatContainer"></div></div></div><div id="rightColumn"><div id="banner"></div><div id="mainContent"></div></div></div>';
+
+
+/******************************************************
+ * Page master class
+ */
+var Page = function() {
+
+};
+
+//If this doesn't return true, it is expected that fading in is handled manually
+Page.prototype.render = function() {
+    $("body").html("<h1>Placeholder, please fix</h1>");
+    return true;
+};
+
+//Called as soon as we know we are transferring to this page. Used to load stuff while the old page is animating out
+Page.prototype.onInit = function() {
+
+}
+//Called as soon as the page starts fading out
+Page.prototype.onDeInit = function() {
+    console.log("Goodbye!");
+};
+
+/******************************************************
+ * Login page
+ */
+
+var LoginPage = function() {
+    Page.call(this);
+};
+
+//Make LoginPage a subclass of Page. Javascript OOP is weird
+LoginPage.prototype = Object.create(Page.prototype);
+LoginPage.prototype.constructor = LoginPage;
+
+LoginPage.prototype.render = function() {
+    $("body").html(login_html);
+    return true;
+};
+
+/*****************************************************
+ * Index page
+ */
+
+var IndexPage = function() {
+    Page.call(this);
+};
+
+IndexPage.prototype = Object.create(Page.prototype);
+IndexPage.prototype.constructor = IndexPage;
+IndexPage.prototype.render = function() {
+    $("#mainContent").html("<h1>Velkommen til infected compo v2!</h1>");
+    return true;
+};
+
+
+/*****************************************************
+ * Compo list page
+ */
+
+var CompoPage = function() {
+    Page.call(this);
+};
+
+CompoPage.prototype = Object.create(Page.prototype);
+CompoPage.prototype.constructor = CompoPage;
+CompoPage.prototype.render = function() {
+    $("#mainContent").html("<h1>Compoer</h1>");
+    return false;
+};
+
+/*****************************************************
+ * Download manager
+ */
+
+var DownloadJsonTask = function(url, onFinished) {
+    this.url = url;
+    this.onFinished = onFinished;
+}
+
+DownloadJsonTask.prototype.start = function() {
+    var _this = this;
+    $.getJSON(this.url, function(data){
+	if(data.result == true)
+	{
+	    _this.onFinished(data);
+	    _this.downloadMaster.success(_this);
+	} else {
+	    _this.downloadMaster.fail(_this);
+	}
+    });
+};
+
+DownloadJsonTask.prototype.downloadMaster = null;
+
+var PageDownloadWaiter = function(tasks, pageId) {
+    this.tasks = tasks;
+    this.downloaded = 0;
+    this.pageId = pageId;
+    for(var i = 0; i < this.tasks.length; i++) {
+	this.tasks[i].downloadMaster = this;
+    }
+    console.log("Download manager initialized");
+};
+
+PageDownloadWaiter.prototype.start = function() {
+    console.log("Starting download");
+    for(var i = 0; i < this.tasks.length; i++) {
+	this.tasks[i].start();
+    }
+};
+
+PageDownloadWaiter.prototype.fail = function(task) {
+    error("Det skjedde en feil under nedlastingen av nødvendig data. Prøv å oppdatere siden");
+    console.log("Failed download: " + task);
+};
+
+PageDownloadWaiter.prototype.success = function(task) {
+    this.downloaded++;
+    if(this.downloaded == this.tasks.length) {
+	$("#" + this.pageId).fadeIn(300);
+    }
+};
+
+/*****************************************************
+ * Page bookkeeping
+ */
+
+var pages = {index: new IndexPage(), compo: new CompoPage()};
+var currentPage = "login";
+
+//Startup
+console.log("Infected compo booting up!");
+
+$(document).ready(function(){
+    if(!loggedIn) {
+	console.log("Init login dialog");
+	var login = new LoginPage();
+	currentPage = login;
+	login.render();
+    } else {
+	if(location.hash.length>0) {
+	    if(typeof(pages[location.hash.substring(1).split("-")[0]]) !== 'undefined') {
+		gotoPage(location.hash.substring(1).split("-")[0]);
+	    } else {
+		gotoPage("index");
+	    }
+	} else {
+	    gotoPage("index");
+	}
+    }
 });
-function addTeam()
-{
-	window.location.href = "index.php?page=addTeam";
-}
-function updateCompoStatus() {
-	$.getJSON('../api/json/compo/getCompoStatus.php', function(data){
-		if(data.result == true) {
-			if(shouldRefreshTeamData) {
- 				$("#teamData").html("");
-				for(var i = 0; i < data.data.clans.length; i++) {
-					$("#teamData").append('<div class="teamEntry" id="teamHeaderId' + data.data.clans[i].id + '"><h1>' + data.data.clans[i].tag + '</h1><h3> - ' + data.data.clans[i].compo.tag + '</h3>');
-					$("#teamHeaderId" + data.data.clans[i].id).click({teamId: data.data.clans[i].id}, function(e){window.location="index.php?page=team&id=" + e.data.teamId});
-				}
-			}
-			if(data.data.invites.length != 0) {
-				//$("#teamData").append("<h3>Invites</h3>");
-				for(var i = 0; i < data.data.invites.length; i++) {
-					$("#teamData").append('<div class="teamEntry" id="teamHeaderId' + data.data.invites[i].clanData.id + '"><h1>' + data.data.invites[i].clanData.tag + '</h1><h3> - ' + data.data.invites[i].compo.tag + '</h3><br /><i class="teamEntry" id="inviteAccept' + data.data.invites[i].id + '">Godta</i> - <i class="teamEntry" id="inviteDecline' + data.data.invites[i].id + '">Avslå</i></div>');
-					$("#inviteAccept" + data.data.invites[i].id).click({inviteId: data.data.invites[i].id}, function(e){acceptInvite(e.data.inviteId)});
-					$("#inviteDecline" + data.data.invites[i].id).click({inviteId: data.data.invites[i].id}, function(e){declineInvite(e.data.inviteId)});
-					$("#teamInviteId" + data.data.invites[i].clanData.id).click({teamId: data.data.invites[i].clanData.id}, function(e){window.location="index.php?page=team&id=" + e.data.teamId});
-				}
-			}
-			if(data.data.hasOwnProperty('match')) {
-				if(data.data.match.id != matchId) {
-					initMatchWatchdog(data.data.match.id);
-				}
-			} else {
-				if(matchId != 0) {
-					disableMatchWatchdog();
-					matchId = 0;
-					shouldRefreshTeamData = true;
-				}
-			}
-		} else {
-			error(data.message);
-		}
-  	});
-}
 
-function initMatchWatchdog(newMatchId) {
-	matchId = newMatchId;
-	matchStatusUpdateId = setInterval(matchWatchdog, 5000);
-	matchWatchdog();
-}
+$(window).hashchange(function(){
+    if(location.hash.length>0) {
+	if(typeof(pages[location.hash.substring(1).split("-")[0]]) !== 'undefined') {
+	    gotoPage(location.hash.substring(1).split("-")[0]);
+	} else {
+	    gotoPage("index");
+	}
+    } else {
+	gotoPage("index");
+    }
+});
 
-function disableMatchWatchdog() {
-	clearInterval(matchStatusUpdateId);
-}
-
-function matchWatchdog() {
-	$.getJSON('../api/json/match/getMatchStatus.php?id=' + matchId, function(data){
-	    if(data.result == true) {
-			if(data.matchData.state == 0) {
-				handleAcceptState(data);
-			} else if(data.matchData.state == 1) {
-				handleCustomState(data);
-			} else if(data.matchData.state == 2) {
-				handlePlayState(data);
-			} else {
-				error("Unknown state: " + data.matchData.state);
-			}
-			if(currentPage == "match") {
-				appendChat(data.matchData);
-			}
-		
-			lastMatchState = data.matchData.state;
-		} else {
-			error(data.message);
-		}
-  	});
-}
-var lastChatId = -1;
-function appendChat(matchData) {
-    if(matchData.chatId != lastChatId) {
-	Chat.unbindChat("compoChatField");
-	$("#chatArea").html('<h3>Chat - Match (Her kan alle chatte)</h3><div id="compoChatField"></div>');
-	Chat.bindChat("compoChatField", matchData.chatId, 300);
-	lastChatId = matchData.chatId;
+function gotoPage(hashId) {
+    if(typeof(pages[hashId]) === 'undefined') {
+	console.log("Tried to navigate to non-existing page: " + hashId);
+	return;
+    }
+    if(currentPage == "login") {
+	renderSidebar();
+	currentPage = hashId;
+	console.log("Starting transfer to " + hashId);
+	pages[hashId].onInit();
+	pages[hashId].render();
+    } else {
+	pages[currentPage].onDeInit();
+	pages[hashId].onInit();
+	$("#mainContent").fadeOut(300, function(){
+	    currentPage = hashId;
+	    if(pages[hashId].render()) {
+		$("#mainContent").fadeIn(300);
+	    }
+	});
     }
 }
-function hasAccepted(data) {
-	for(var i = 0; i < data.matchData.readyData.length; i++) {
-		for(var x = 0; x < data.matchData.readyData[i].members.length; x++)
-		{
-			//console.log(i + " " + x);
-			if(data.matchData.readyData[i].members[x].userId == myUserId) {
-				//console.log("user!");
-				return data.matchData.readyData[i].members[x].ready;
-			}
-		}
+
+function renderSidebar() {
+    $("body").html(sidebar_html);
+    var userDataTask = new DownloadJsonTask("../api/json/user/getUserData.php", function(data){
+	console.log("Got user data: " + data);
+	$("#userProfilePic").html('<img src="' + data.data.avatar.thumb + '" />');
+	$("#userName").html('<p>' + data.data.displayName + '</p>');
+    });
+    var compoDataTask = new DownloadJsonTask("../api/json/compo/getCompos.php", function(data){
+	var currentCompoId = -1;
+	if(location.hash.substr(1).split("-")[0]=="compo") {
+	    currentCompoId = location.hash.substr(1).split("-")[1];
+	    console.log("Current compo id: " + currentCompoId);
 	}
-	return false;
-}
-//Funuctions for states
-function handleAcceptState(data) {
-
-	if(currentPage == "match") {
-		var acceptScreenLayout = [];
-		acceptScreenLayout.push('<br /><br />');
-		if(!hasAccepted(data)) {
-			acceptScreenLayout.push('<p id="matchAcceptBtn" class="acpt acptLarge">ACCEPT</p>');
-		} else {
-
-		}
-		acceptScreenLayout.push('<div id="vsBox">');
-			acceptScreenLayout.push('<div id="vsTitle">');
-				acceptScreenLayout.push('<span class="yourTeam"> ' + data.matchData.readyData[0].clanName + " - " + data.matchData.readyData[0].clanTag + ' </span> vs <span class="theirTeam"> ' + data.matchData.readyData[1].clanName + " - " + data.matchData.readyData[1].clanTag + ' </span>');
-			acceptScreenLayout.push('</div>');
-			acceptScreenLayout.push('<div id="vsLeft">');
-				for(var i = 0; i < data.matchData.readyData[0].members.length; i++)
-				{
-					acceptScreenLayout.push('<div class="leftPlayer">');
-						acceptScreenLayout.push('<div class="playerImg"><img src="../api/' + data.matchData.readyData[0].members[i].avatarUrl + '" /></div>');
-						acceptScreenLayout.push('<span class="playerName">' + data.matchData.readyData[0].members[i].nick + '</span>');
-						if(data.matchData.readyData[0].members[i].ready) {
-							acceptScreenLayout.push('<div class="rdyBtn YESrdy"><p>READY</p></div>');
-						} else {
-							acceptScreenLayout.push('<div class="rdyBtn NOrdy"><p>NOT READY</p></div>');
-						}
-					acceptScreenLayout.push('</div>');
-				}
-			acceptScreenLayout.push('</div>');
-			acceptScreenLayout.push('<div id="vsRight">');
-				for(var i = 0; i < data.matchData.readyData[1].members.length; i++)
-				{
-					acceptScreenLayout.push('<div class="rightPlayer">');
-						acceptScreenLayout.push('<div class="playerImg"><img src="../api/' + data.matchData.readyData[1].members[i].avatarUrl + '" /></div>');
-						acceptScreenLayout.push('<span class="playerName">' + data.matchData.readyData[1].members[i].nick + '</span>');
-						if(data.matchData.readyData[1].members[i].ready) {
-							acceptScreenLayout.push('<div class="rdyBtn YESrdy"><p>READY</p></div>');
-						} else {
-							acceptScreenLayout.push('<div class="rdyBtn NOrdy"><p>NOT READY</p></div>');
-						}
-					acceptScreenLayout.push('</div>');
-				}
-			acceptScreenLayout.push('</div>');
-		acceptScreenLayout.push('</div>');
-
-		$("#matchArea").html(acceptScreenLayout.join(""));
-
-		$("#matchAcceptBtn").click(function(e) {
-			acceptMatch(matchId);
-		});
-	} else {
-		if(!hasAccepted(data)) {
-			$("#teamData").html("<center><h1 style='top: -10px;'>Game ready</h1></center><p id='smallAccept' class='acpt acptSmall'>ACCEPT</p>");
-			$("#addTeam").remove();
-			$("#smallAccept").click(/*{matchId: data.matchData.id}, */function(e) {
-				//acceptMatch(e.data.matchId);
-				acceptMatch(matchId);
-			});
-			shouldRefreshTeamData = false;
-		}
+	for(var i = 0; i < data.data.length; i++) {
+	    $("#banner").append('<div id="compoBtn' + i + '" class="gameType ' + (data.data[i].id == currentCompoId ? ' selected' : '') + '"><p>' + data.data[i].tag + '</p></div>');
+	    var compo = data.data[i];
+	    $("#compoBtn"+i).click(function(){
+		window.location = "index.php#compo-"+compo.id;
+	    });
 	}
-}
-function isChief(data) {
-	for(var i = 0; i < data.matchData.banData.clans.length; i++) {
-		for(var x = 0; x < data.matchData.banData.clans[i].members.length; x++) {
-			if(data.matchData.banData.clans[i].members[x].userId == myUserId) {
-				return data.matchData.banData.clans[i].members[x].chief;
-			}
-		}
-	}
-	return false;
-}
-function getCurrentPicker(data) {
-	var turn = data.matchData.banData.turn;
-	for(var i = 0; i < data.matchData.banData.clans[turn].members.length; i++) {
-		if(data.matchData.banData.clans[turn].members[i].chief) {
-			return data.matchData.banData.clans[turn].members[i].nick;
-		}
-	}
-}
-function handleCustomState(data) {
-	if(currentPage == "match") {
-		var banData = [];
-		banData.push('<div class="voteScreen">');
-			banData.push('<div class="banBoxText">');
-	            banData.push('<br>');
-	            banData.push('<br>');
-	            if(data.matchData.banData.turn == 2) {
-	            	banData.push('<p style="text-align:right; margin:30px 0px 0px;">Vennligst vent...</p>');
-	            	banData.push('<p style="font-size: 30px; margin-top: 0px; text-align:right;"></p>');
-	            } else {
-	            	banData.push('<p style="text-align:right; margin:30px 0px 0px;">Klikk et map når det er din tur til å banne map</p>');
-	            	banData.push('<p style="font-size: 30px; margin-top: 0px; text-align:right;">Det er <span class="playerNameBanning">"'+ getCurrentPicker(data) + '" </span> sin tur til å banne</p>');
-	            }
-	            banData.push('<br>');
-	        banData.push('</div>');
-	        for(var i = 0; i < data.matchData.banData.options.length; i++) {
-	        	banData.push('<div id="banBoxId' + i + '" class="banBox">');
-	        		if(data.matchData.banData.options[i].isBanned) {
-	        			banData.push('<img src="images/' + data.matchData.banData.options[i].thumbnailUrl + '_banned.png"/>');
-	        		} else {
-						banData.push('<img src="images/' + data.matchData.banData.options[i].thumbnailUrl + '.png"/>');
-	        		}
-	        		banData.push('<p>' + data.matchData.banData.options[i].name + '</p>');
-	        	banData.push('</div>');
-	        }
-        banData.push('</div>');
-        $("#matchArea").html(banData.join(""));
-        for(var i = 0; i < data.matchData.banData.options.length; i++) {
-	        	$("#banBoxId" + i).click({mapId: data.matchData.banData.options[i].id}, function(e) {
-	        		banMap(e.data.mapId);
-	        	});
-	        }
-	} else {
-		if(isChief(data)) {
-			$("#teamData").html("<center><h1>Du er chief!</h1>Vennligst gå <a href='index.php?page=match'>hit</a> for å banne maps</center>");
-			$("#addTeam").remove();
-		} else {
-			//console.log("Not chief, not on match");
-		}
-	}
-}
-function handlePlayState(data) {
-	if(currentPage == "match") {
-		if(data.matchData.compoId == 6) { //LoL
-			var matchData = [];
-
-			matchData.push("<h1>Gamet er klart!</h1>");
-			matchData.push("<p>Dere er ansvarlige for å lage et custom game. Bruk chatten for å dele informasjon.</p>");
-			matchData.push("<br />");
-			matchData.push("<i>Si ifra til game når dere er ferdige</i>");
-
-			$("#matchArea").html(matchData.join(""));
-		} else if(data.matchData.compoId == 5) { //CS:GO
-			var matchData = [];
-
-			matchData.push('<div class="playScreen">');
-            	matchData.push('<div style="position:relative; overflow:hidden; height:200px;">');
-                    matchData.push('<div style="float:left; position:relative; width:50%; height:100%;">');
-                    	matchData.push('<p style="float:right; position:absolute; bottom:0; right:20px; font-size:30px; margin-bottom:0px;">Map: ' + data.matchData.gameData.mapData.name + ' </p>');
-                    matchData.push('</div>');
-                    matchData.push('<div style="float:left; position:relative; width:50%;  height:100%">');
-                    	matchData.push('<div class="map">');
-                    		matchData.push('<img src="images/' + data.matchData.gameData.mapData.thumbnail + '.png" />');
-                        matchData.push('</div>');
-                    matchData.push('</div>');
-                matchData.push('</div>');
-            	matchData.push('<br />');
-            	matchData.push('<p id="startGameBtn" class="acpt acptLarge go">PLAY</p>');
-                matchData.push('<h4 style="text-align: center;">NB: Har du Windows 8 er du NØDT til å koble til med konsollen</h4>');
-                matchData.push('<p style="text-align: center;">Trykk play eller skriv i konsollen: <i>connect ' + data.matchData.gameData.connectDetails + '</i></p>');
-                //matchData.push('<p class="ippw">Hvert lag er nødt til å skrive !map de_' + data.matchData.gameData.mapData.name.toLowerCase() + ' når de kobler til</p>');
-            matchData.push('</div>');
-			$("#matchArea").html(matchData.join(""));
-			$("#startGameBtn").click({consoleData: data.matchData.gameData.connectDetails}, function(e) {
-				startGame(e.data.consoleData);
-			});
-		}
-	} else {
-		$("#teamData").html("<center><h1>Gamet ditt er klart!</h1>Vennligst gå <a href='index.php?page=match'>hit</a> for å starte</center>");
-		$("#addTeam").remove();
-	}
-}
-function startGame(consoleData) {
-	var connectUrl = 'steam://connect/' + consoleData.replace(";password ", "/");
-	console.log("Connecting to " + connectUrl);
-	window.location = connectUrl;
-}
-function banMap(mapId) {
-	$.getJSON('../api/json/match/banmap.php?id=' + encodeURIComponent(mapId) + '&matchId=' + matchId, function(data){
-		if(data.result) {
-			matchWatchdog();
-		} else {
-			error(data.message);
-		}
-	});
-}
-function acceptMatch(id) {
-	$.getJSON('../api/json/match/acceptMatch.php?id=' + encodeURIComponent(id), function(data){
-		if(data.result) {
-			window.location = "index.php?page=match";
-		} else {
-			error(data.message);
-		}
-	});
-}
-function acceptInvite(inviteId) {
-	$.getJSON('../api/json/invite/acceptInvite.php?id=' + encodeURIComponent(inviteId), function(data){
-		if(data.result) {
-			updateCompoStatus();
-		} else {
-			error(data.message);
-		}
-	});
-}
-function declineInvite(inviteId) {
-	$.getJSON('../api/json/invite/declineInvite.php?id=' + encodeURIComponent(inviteId), function(data){
-		if(data.result) {
-			updateCompoStatus();
-		} else {
-			error(data.message);
-		}
-	});
+    });
+    $("#addTeam").click(function() {
+	window.location = "index.php#newTeam";
+    });
+    var downloadManager = new PageDownloadWaiter([userDataTask, compoDataTask], "content");
+    downloadManager.start();
 }
 
-function editUser() {
-	$(location).attr('href', 'index.php?page=edit-profile');
+function getQueryVariable(variable) {
+    var query = window.location.search.substring(1);
+    var vars = query.split("&");
+    for (var i=0;i<vars.length;i++) {
+	var pair = vars[i].split("=");
+	if (pair[0] == variable) {
+	    return pair[1];
+	}
+    } 
+    return null;
 }
