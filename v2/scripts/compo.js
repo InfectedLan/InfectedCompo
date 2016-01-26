@@ -93,7 +93,10 @@ NewTeamPage.prototype = Object.create(Page.prototype);
 NewTeamPage.prototype.constructor = NewTeamPage;
 NewTeamPage.prototype.render = function() {
     $("#mainContent").html(newTeam_html);
-    return false;
+    for(var i = 0; i < compoData.length; i++) {
+	$("#compoSelect").append($('<option>', {value: compoData[i].id, text: compoData[i].title}));
+    }
+    return true;
 };
 NewTeamPage.prototype.javascriptModule = "addTeam.js";
 
@@ -206,7 +209,7 @@ function gotoPage(hashId) {
 	var result = pages[hashId].render();
 	//We want to do the javascript before things are faded in
 	if(pages[hashId].javascriptModule != null) {
-	    $("#mainContent").append('<script src="' + pages[hashId].javascriptModule + '"></script>');
+	    $("#mainContent").append('<script src="scripts/' + pages[hashId].javascriptModule + '"></script>');
 	}
 	if(result) {
 	    $("#mainContent").fadeIn(300);
@@ -219,7 +222,8 @@ function gotoPage(hashId) {
 	    var result = pages[hashId].render();
 	    //We want to do the javascript before things are faded in
 	    if(pages[hashId].javascriptModule != null) {
-		$("#mainContent").append('<script src="' + pages[hashId].javascriptModule + '"></script>');
+		console.log("Loading javascript module: " + pages[hashId].javascriptModule);
+		$("#mainContent").append('<script src="scripts/' + pages[hashId].javascriptModule + '"></script>');
 	    }
 	    if(result) {
 		$("#mainContent").fadeIn(300);
