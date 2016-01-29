@@ -6,7 +6,7 @@ var login_html = '<div id="loginbox"><script src="../api/scripts/login.js"></scr
 
 var sidebar_html = '<div id="content" style="display:none;"><div id="leftColumn"><div id="profileBox"><div id="userProfilePic"></div><div id="userName"></div><div><a id="editUserLabel" href="javascript:editUser()">Endre profil</a><a id="logOutLabel" href="javascript:logout()">Logg ut</a></div></div><div id="teamBox"><p style="position:absolute; top:-45px;">Teams</p><div id="teamData"><h3>Laster inn...</h3></div><p id="addTeam"><span style="font-size:20px; margin-top:-15px;">+</span> Add Team</p></div><div id="chatBox"><div id="chatContainer"></div></div></div><div id="rightColumn"><div id="banner"></div><div id="mainContent"></div></div></div>';
 
-var newTeam_html = '<script src="scripts/addTeam.js"> </script><h1>Lag team</h1><table><tr><td width="50%"><table><tr><td>Teamname:</td><td><input type="text" id="clanName" /></td></tr><tr><td>Teamtag:</td><td><input type="text" id="clanTag" /></td></tr><tr><td>Compo:</td><td><select id="compoSelect"></select></td></tr><tr><td><div id="addClanButtonWrapper"><input type="button" value="Lag klan!" onClick="registerClan()" /></div></td></tr></table></td><td width="50%">Invite teammates: <input id="inviteSearchBox" type="text" /><br /><div id="searchResultsResultPane"></div><br /><h3>Invited players:</h3><div id="invidedPlayers"></div></td></tr></table>';
+var newTeam_html = '<h1>Lag team</h1><table><tr><td width="50%"><table><tr><td>Teamname:</td><td><input type="text" id="clanName" /></td></tr><tr><td>Teamtag:</td><td><input type="text" id="clanTag" /></td></tr><tr><td>Compo:</td><td><select id="compoSelect"></select></td></tr><tr><td><div id="addClanButtonWrapper"><input id="btnRegisterClan" type="button" value="Lag klan!" /></div></td></tr></table></td><td width="50%">Invite teammates: <input id="inviteSearchBox" type="text" /><br /><div id="searchResultsResultPane"></div><br /><h3>Invited players:</h3><div id="invidedPlayers"></div></td></tr></table>';
 
 /******************************************************
  * Page master class
@@ -30,8 +30,6 @@ Page.prototype.onDeInit = function() {
     console.log("Goodbye!");
 };
 
-//If this is set, will load and manage a javascript module for this page. Please note that events should only be set on the page contents to avoid multiple events firing
-Page.prototype.javascriptModule = null;
 
 /******************************************************
  * Login page
@@ -93,36 +91,71 @@ NewTeamPage.prototype = Object.create(Page.prototype);
 NewTeamPage.prototype.constructor = NewTeamPage;
 NewTeamPage.prototype.render = function() {
     $("#mainContent").html(newTeam_html);
-    for(var i = 0; i < compoData.length; i++) {
-	$("#compoSelect").append($('<option>', {value: compoData[i].id, text: compoData[i].title}));
-    }
-    return true;
+    
+    var compoListTask = new DownloadDatastoreTask("../api/json/compo/getCompos.php", "compoList", function() {
+	for(var i = 0; i < datastore["compoList"].length; i++) {
+	    $("#compoSelect").append($('<option>', {value: datastore["compoList"][i].id, text: datastore["compoList"][i].title}));
+	}
+	$.getScript("scripts/addTeam.js").done(function(script, status) {
+	    $("#mainContent").fadeIn(300);
+	}).fail(function(jqxhr, settings, exception) {
+	    console.log(exception);
+	});
+    });
+    compoListTask.start();
+    return false;
 };
-NewTeamPage.prototype.javascriptModule = "addTeam.js";
 
 /*****************************************************
  * Download manager
  */
 
-var DownloadJsonTask = function(url, onFinished) {
+var DownloadDatastoreTask = function(url, name, onFinished, ignoreIfExisting) {
     this.url = url;
     this.onFinished = onFinished;
-}
-
-DownloadJsonTask.prototype.start = function() {
-    var _this = this;
-    $.getJSON(this.url, function(data){
-	if(data.result == true)
-	{
-	    _this.onFinished(data);
-	    _this.downloadMaster.success(_this);
-	} else {
-	    _this.downloadMaster.fail(_this);
-	}
-    });
+    this.name = name;
+    this.ignoreIfExisting = (typeof(ignoreIfExisting) !== 'undefined' ? ignoreIfExisting : true);
 };
 
-DownloadJsonTask.prototype.downloadMaster = null;
+DownloadDatastoreTask.prototype.start = function() {
+    if(this.ignoreIfExisting && typeof(datastore[this.name]) !== "undefined") {
+	console.log("Ignoring datastore download " + this.url + " as it allready exists");
+	this.onFinished(datastore[this.name]);
+	if(typeof(this.downloadMaster) !== "undefined") {
+	    this.downloadMaster.success(this);
+	}
+    } else if(typeof(downloadingDatastores[this.name]) !== "undefined") { //Checks if we have a download going for it
+	console.log("Allready downloading data, putting this function in the finished queue");
+	downloadingDatastores[this.name].push(this.onFinished);
+    } else {
+	console.log("Downloading new datastore " + this.url + ".");
+	downloadingDatastores[this.name] = [];
+	var _this = this;
+	$.getJSON(this.url, function(data){
+	    console.log("Done downloading " + _this.url);
+	    if(data.result == true)
+	    {
+		datastore[_this.name] = data.data;
+		_this.onFinished(data.data);
+		//Run other download functions
+		for(var i = 0; i < downloadingDatastores[_this.name].length; i++) {
+		    downloadingDatastores[_this.name][i](data.data);
+		}
+		delete downloadingDatastores[_this.name];
+		if(typeof(_this.downloadMaster) !== "undefined") {
+		    _this.downloadMaster.success(_this);
+		}
+	    } else {
+		if(typeof(_this.downloadMaster) !== "undefined") {
+		    _this.downloadMaster.fail(_this);
+		}
+	    }
+	});
+    }
+};
+
+//Don't uncomment this, will break DownloadDatastoreTask.start().
+//DownloadDatastoreTask.prototype.downloadMaster = null;
 
 var PageDownloadWaiter = function(tasks, pageId) {
     this.tasks = tasks;
@@ -135,7 +168,7 @@ var PageDownloadWaiter = function(tasks, pageId) {
 };
 
 PageDownloadWaiter.prototype.start = function() {
-    console.log("Starting download");
+    console.log("Starting downloads");
     for(var i = 0; i < this.tasks.length; i++) {
 	this.tasks[i].start();
     }
@@ -153,14 +186,23 @@ PageDownloadWaiter.prototype.success = function(task) {
     }
 };
 
+function getDatastore(url, name, onFetch){
+    if(typeof(datastore[name]) === "undefined") {
+	var downloader = new DownloadDatastoreTask(url, name, onFetch);
+	downloader.start();
+    } else {
+	onFetch(datastore[name]);
+    }
+};
+
 /*****************************************************
  * Page bookkeeping
  */
 
 var pages = {index: new IndexPage(), compo: new CompoPage(), newTeam: new NewTeamPage()};
 var currentPage = "login";
-var userData = null;
-var compoData = null;
+var datastore = {}; //This is where we store data we have downloaded
+var downloadingDatastores = {};
 
 //Startup
 console.log("Infected compo booting up!");
@@ -172,6 +214,7 @@ $(document).ready(function(){
 	currentPage = login;
 	login.render();
     } else {
+	renderSidebar();
 	if(location.hash.length>0) {
 	    if(typeof(pages[location.hash.substring(1).split("-")[0]]) !== 'undefined') {
 		gotoPage(location.hash.substring(1).split("-")[0]);
@@ -196,7 +239,21 @@ $(window).hashchange(function(){
     }
 });
 
+
+//Used to get unique div id's when needed
+var getUniqueId = (function(){
+    var uuidCounter = 0;
+    return function() {
+	return uuidCounter++;
+    };
+})();
+
+/*****************************************************
+ * Page handling
+ */
+
 function gotoPage(hashId) {
+    console.log("going to page");
     if(typeof(pages[hashId]) === 'undefined') {
 	console.log("Tried to navigate to non-existing page: " + hashId);
 	return;
@@ -208,9 +265,6 @@ function gotoPage(hashId) {
 	pages[hashId].onInit();
 	var result = pages[hashId].render();
 	//We want to do the javascript before things are faded in
-	if(pages[hashId].javascriptModule != null) {
-	    $("#mainContent").append('<script src="scripts/' + pages[hashId].javascriptModule + '"></script>');
-	}
 	if(result) {
 	    $("#mainContent").fadeIn(300);
 	}
@@ -220,11 +274,6 @@ function gotoPage(hashId) {
 	$("#mainContent").fadeOut(300, function(){
 	    currentPage = hashId;
 	    var result = pages[hashId].render();
-	    //We want to do the javascript before things are faded in
-	    if(pages[hashId].javascriptModule != null) {
-		console.log("Loading javascript module: " + pages[hashId].javascriptModule);
-		$("#mainContent").append('<script src="scripts/' + pages[hashId].javascriptModule + '"></script>');
-	    }
 	    if(result) {
 		$("#mainContent").fadeIn(300);
 	    }
@@ -236,37 +285,36 @@ function gotoPage(hashId) {
 
 function renderSidebar() {
     $("body").html(sidebar_html);
-    var userDataTask = new DownloadJsonTask("../api/json/user/getUserData.php", function(data){
+    var userDataTask = new DownloadDatastoreTask("../api/json/user/getUserData.php", "userData", function(data){
 	console.log("Got user data: " + data);
-	$("#userProfilePic").html('<img src="' + data.data.avatar.thumb + '" />');
-	$("#userName").html('<p>' + data.data.displayName + '</p>');
-	userData = data.data;
+	$("#userProfilePic").html('<img src="' + data.avatar.thumb + '" />');
+	$("#userName").html('<p>' + data.displayName + '</p>');
     });
-    var compoDataTask = new DownloadJsonTask("../api/json/compo/getCompos.php", function(data){
-	compoData = data.data;
-	renderBanner();
-    });
+    renderBanner();
     $("#addTeam").click(function() {
 	window.location = "index.php#newTeam";
     });
-    var downloadManager = new PageDownloadWaiter([userDataTask, compoDataTask], "content");
+    var downloadManager = new PageDownloadWaiter([userDataTask], "content");
     downloadManager.start();
 }
 
 function renderBanner() {
-    $("#banner").html("");
-    var currentCompoId = -1;
-    if(location.hash.substr(1).split("-")[0]=="compo") {
-	currentCompoId = location.hash.substr(1).split("-")[1];
-	console.log("Current compo id: " + currentCompoId);
-    }
-    for(var i = 0; i < compoData.length; i++) {
-	$("#banner").append('<div id="compoBtn' + i + '" class="gameType ' + (compoData[i].id == currentCompoId ? ' selected' : '') + '"><p>' + compoData[i].tag + '</p></div>');
-	var compo = compoData[i];
-	$("#compoBtn"+i).click({compo: compo}, function(event){
-	    window.location = "index.php#compo-"+event.data.compo.id;
-	});
-    }
+    var compoListTask = new DownloadDatastoreTask("../api/json/compo/getCompos.php", "compoList", function(data){
+	$("#banner").html("");
+	var currentCompoId = -1;
+	if(location.hash.substr(1).split("-")[0]=="compo") {
+	    currentCompoId = location.hash.substr(1).split("-")[1];
+	    console.log("Current compo id: " + currentCompoId);
+	}
+	for(var i = 0; i < datastore["compoList"].length; i++) {
+	    $("#banner").append('<div id="compoBtn' + i + '" class="gameType ' + (datastore["compoList"][i].id == currentCompoId ? ' selected' : '') + '"><p>' + datastore["compoList"][i].tag + '</p></div>');
+	    var compo = datastore["compoList"][i];
+	    $("#compoBtn"+i).click({compo: compo}, function(event){
+		window.location = "index.php#compo-"+event.data.compo.id;
+	    });
+	}
+    });
+    compoListTask.start();
 }
 
 function getQueryVariable(variable) {
