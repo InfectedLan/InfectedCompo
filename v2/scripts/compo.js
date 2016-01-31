@@ -8,6 +8,8 @@ var sidebar_html = '<div id="content" style="display:none;"><div id="leftColumn"
 
 var newTeam_html = '<h1>Lag team</h1><table><tr><td width="50%"><table><tr><td>Teamname:</td><td><input type="text" id="clanName" /></td></tr><tr><td>Teamtag:</td><td><input type="text" id="clanTag" /></td></tr><tr><td>Compo:</td><td><select id="compoSelect"></select></td></tr><tr><td><div id="addClanButtonWrapper"><input id="btnRegisterClan" type="button" value="Lag klan!" /></div></td></tr></table></td><td width="50%">Invite teammates: <input id="inviteSearchBox" type="text" /><br /><div id="searchResultsResultPane"></div><br /><h3>Invited players:</h3><div id="invidedPlayers"></div></td></tr></table>';
 
+var clan_html = '<h1 id="clanLabel">Clan</h1><br /><h3 id="compoLabel">compo</h3><br /><b id="qualifiedNotification">notification</b><br /><br /><h2>Medlemmer</h2><table id="playingTable"></table><br /><h2>Step-in medlemmer</h2><table id="stepinTable"></table><br /><h2>Inviterte medlemmer</h2><table id="invitedTable"></table>';
+
 /******************************************************
  * Page master class
  */
@@ -59,8 +61,38 @@ var IndexPage = function() {
 IndexPage.prototype = Object.create(Page.prototype);
 IndexPage.prototype.constructor = IndexPage;
 IndexPage.prototype.render = function() {
-    $("#mainContent").html("<h1>Velkommen til infected compo v2!</h1>");
+    $("#mainContent").html("<h1>Velkommen til infected compo v2!</h1><br /><br />");
+    $("#mainContent").html("Velkommen til infected compo v2! Systemet har blitt omskrevet fra bunnen, og vi håper dere vil like den nye siden.");
     return true;
+};
+
+/*****************************************************
+ * Clan page
+ */
+
+var ClanPage = function() {
+    Page.call(this);
+};
+
+ClanPage.prototype = Object.create(Page.prototype);
+ClanPage.prototype.constructor = CompoPage;
+ClanPage.prototype.render = function() {
+    $("#mainContent").html(clan_html);
+    console.log("Starting downloads for clanPage");
+    var currentClanId = location.hash.substr(1).split("-")[1];
+    var compoListTask = new DownloadDatastoreTask("../api/json/compo/getCompos.php", "compoList", function() {});
+    var compoDataTask = new DownloadDatastoreTask("../api/json/clan/getClanData.php?id=" + encodeURIComponent(currentClanId), "clan-" + currentClanId+"-data", function() {}, false);
+    var userDataTask = new DownloadDatastoreTask("../api/json/user/getUserData.php", "userData", function(data){});
+    
+    var downloadManager = new PageDownloadWaiter([compoListTask, compoDataTask, userDataTask], function() {
+	$.getScript("scripts/clan.js").done(function(script, status) {
+	    $("#mainContent").fadeIn(300);
+	}).fail(function(jqxhr, settings, exception) {
+	    console.log(exception);
+	});
+    });
+    downloadManager.start();
+    return false;
 };
 
 
@@ -75,7 +107,83 @@ var CompoPage = function() {
 CompoPage.prototype = Object.create(Page.prototype);
 CompoPage.prototype.constructor = CompoPage;
 CompoPage.prototype.render = function() {
-    $("#mainContent").html("<h1>Compoer</h1>");
+    $("#mainContent").html("");
+    console.log("Starting downloads for compoPage");
+    var currentCompoId = location.hash.substr(1).split("-")[1];
+    var compoListTask = new DownloadDatastoreTask("../api/json/compo/getCompos.php", "compoList", function() {});
+    var compoDataTask = new DownloadDatastoreTask("../api/json/compo/getCompoData.php?id=" + encodeURIComponent(currentCompoId), "compo-" + currentCompoId+"-data", function() {}, false);
+    
+    var downloadManager = new PageDownloadWaiter([compoListTask, compoDataTask], function() {
+	console.log("Yeyyy we finished!");
+	//Header
+	var compo = null;
+	for(var i = 0; i < datastore["compoList"].length; i++) {
+	    if(datastore["compoList"][i].id == currentCompoId) {
+		compo = datastore["compoList"][i];
+		$("#mainContent").append("<h1>" + datastore["compoList"][i].title + "</h1><br />");
+		break;
+	    }
+	}
+	//Clans currently in
+	var clanList = datastore["compo-" + currentCompoId + "-data"].clans;
+	//Sort into qualified and non-qualified clans
+	var qualifiedClans = [];
+	var unQualifiedClans = [];
+	for(var i = 0; i < clanList.length; i++) {
+	    if(clanList[i].qualified) {
+		qualifiedClans.push(clanList[i]);
+	    } else {
+		unQualifiedClans.push(clanList[i]);
+	    }
+	}
+	//Render compo list
+	if(compo.participantLimit != 0) {
+	    $("#mainContent").append("<h3>Kvalifiserte lag(" + qualifiedClans.length + " av " + compo.participantLimit + "):</h3>");
+	} else {
+	    $("#mainContent").append("<h3>Kvalifiserte lag:</h3>");
+	}
+	$("#mainContent").append("<br /><br />");
+
+	var addClanLink = function(id, text) {
+	    //console.log("Adding clan link for " + text + "(id " + id + ")");
+	    $("#mainContent").find("ul").last().append('<li class="teamEntry" >' + text +"</li>");
+	    $("#mainContent").find("li").last().on('click', function() {
+		window.location="index.php#clan-" + id;
+	    });
+	};
+	
+	if(qualifiedClans.length == 0) {
+	    $("#mainContent").append("<i>Ingen lag er kvalifiserte enda</i>");
+	} else {
+	    $("#mainContent").append("<ul></ul>");
+	    for(var i = 0; i < qualifiedClans.length; i++) {
+		addClanLink(qualifiedClans[i].id, qualifiedClans[i].name);
+	    }
+	}
+
+	$("#mainContent").append("<br /><br />");
+
+	if(unQualifiedClans.length != 0) {
+	    $("#mainContent").append("<h3>Ukvalifiserte lag:</h3>");
+	    $("#mainContent").append("<ul></ul>");
+	    for(var i = 0; i < unQualifiedClans.length; i++) {
+		addClanLink(unQualifiedClans[i].id, unQualifiedClans[i].name);
+	    }
+	    if(qualifiedClans.length == compo.participantLimit) {
+		$("#mainContent").append('<i>Disse lagene mangler spillere, eller rakk ikke å fylle laget før alle plassene ble tatt. Disse vil ha en sjanse til å få en plass om et kvalifisert lag må melde seg ut, eller blir diskvalifisert.</i>');
+	    } else {
+		$("#mainContent").append('<i>Disse lagene mangler spillere, og vil ikke kunne delta før de har fyllt laget.</i>');
+	    }
+	}
+	/*
+	$("#mainContent").append("<ul></ul>");
+	for(var i = 0; i < clanList.length; i++) {
+	    $("#mainContent").find("ul").first().append("<li>ayoo</li>");
+	}
+	*/
+	$("#mainContent").fadeIn(300);
+    });
+    downloadManager.start();
     return false;
 };
 
@@ -127,6 +235,12 @@ DownloadDatastoreTask.prototype.start = function() {
     } else if(typeof(downloadingDatastores[this.name]) !== "undefined") { //Checks if we have a download going for it
 	console.log("Allready downloading data, putting this function in the finished queue");
 	downloadingDatastores[this.name].push(this.onFinished);
+	if(typeof(this.downloadMaster) !== "undefined") {
+	    var _this = this;
+	    downloadingDatastores[this.name].push(function() {
+		_this.downloadMaster.success(_this);
+	    });
+	}
     } else {
 	console.log("Downloading new datastore " + this.url + ".");
 	downloadingDatastores[this.name] = [];
@@ -154,13 +268,14 @@ DownloadDatastoreTask.prototype.start = function() {
     }
 };
 
-//Don't uncomment this, will break DownloadDatastoreTask.start().
+//Don't uncomment this, will break DownloadDatastoreTask.start(). Times i have stumbled upon this line wondering what i did wrong: 1
 //DownloadDatastoreTask.prototype.downloadMaster = null;
 
-var PageDownloadWaiter = function(tasks, pageId) {
+//doneEvent takes either a string or a function. if string, it will fade in the div with an id specified. If function, it will run the function
+var PageDownloadWaiter = function(tasks, doneEvent) {
     this.tasks = tasks;
     this.downloaded = 0;
-    this.pageId = pageId;
+    this.doneEvent = doneEvent;
     for(var i = 0; i < this.tasks.length; i++) {
 	this.tasks[i].downloadMaster = this;
     }
@@ -180,9 +295,14 @@ PageDownloadWaiter.prototype.fail = function(task) {
 };
 
 PageDownloadWaiter.prototype.success = function(task) {
+    console.log("Download waiter completed!");
     this.downloaded++;
     if(this.downloaded == this.tasks.length) {
-	$("#" + this.pageId).fadeIn(300);
+	if(typeof(this.doneEvent) == "function") {
+	    this.doneEvent();
+	} else {
+	    $("#" + this.doneEvent).fadeIn(300);
+	}
     }
 };
 
@@ -199,7 +319,7 @@ function getDatastore(url, name, onFetch){
  * Page bookkeeping
  */
 
-var pages = {index: new IndexPage(), compo: new CompoPage(), newTeam: new NewTeamPage()};
+var pages = {index: new IndexPage(), compo: new CompoPage(), newTeam: new NewTeamPage(), clan: new ClanPage()};
 var currentPage = "login";
 var datastore = {}; //This is where we store data we have downloaded
 var downloadingDatastores = {};
@@ -283,19 +403,77 @@ function gotoPage(hashId) {
     renderBanner(); //Update the banner selected state
 }
 
+function refresh() {
+    datastore = []; //Clear all stored data
+    currentPage == "login";
+    if(location.hash.length>0) {
+	if(typeof(pages[location.hash.substring(1).split("-")[0]]) !== 'undefined') {
+	    gotoPage(location.hash.substring(1).split("-")[0]);
+	} else {
+	    gotoPage("index");
+	}
+    } else {
+	gotoPage("index");
+    }
+}
+
 function renderSidebar() {
     $("body").html(sidebar_html);
     var userDataTask = new DownloadDatastoreTask("../api/json/user/getUserData.php", "userData", function(data){
 	console.log("Got user data: " + data);
 	$("#userProfilePic").html('<img src="' + data.avatar.thumb + '" />');
 	$("#userName").html('<p>' + data.displayName + '</p>');
+	$("#content").fadeIn(300);
     });
+    userDataTask.start();
     renderBanner();
+    renderClanList();
     $("#addTeam").click(function() {
 	window.location = "index.php#newTeam";
     });
-    var downloadManager = new PageDownloadWaiter([userDataTask], "content");
-    downloadManager.start();
+}
+
+function renderClanList() {
+    var clanListTask = new DownloadDatastoreTask("../api/json/compo/getCompoStatus.php", "clanList", function(data){
+	//Add teams
+	$("#teamData").html("");
+	for(var i = 0; i < data.clans.length; i++) {
+	    $("#teamData").append('<div class="teamEntry" id="teamHeaderId' + data.clans[i].id + '"><h1>' + data.clans[i].tag + '</h1><h3> - ' + data.clans[i].compo.tag + '</h3>');
+	    $("#teamHeaderId" + data.clans[i].id).click({teamId: data.clans[i].id}, function(e){window.location="index.php#clan-" + e.data.teamId});
+	}
+	//Render invites
+	var acceptInvite = function(inviteId) {
+	    $.getJSON('../api/json/invite/acceptInvite.php?id=' + encodeURIComponent(inviteId), function(data){
+		if(data.result) {
+		    renderClanList();
+		} else {
+		    error(data.message);
+		}
+	    });
+	}
+	var declineInvite = function(inviteId) {
+	    $.getJSON('../api/json/invite/declineInvite.php?id=' + encodeURIComponent(inviteId), function(data){
+		if(data.result) {
+		    renderClanList();
+		} else {
+		    error(data.message);
+		}
+	    });
+	}
+	for(var i = 0; i < data.invites.length; i++) {
+	    $("#teamData").append('<div class="teamEntry" id="teamHeaderId' + data.invites[i].clanData.id + '"><h1>' + data.invites[i].clanData.tag + '</h1><h3> - ' + data.invites[i].compo.tag + '</h3><br /><i class="teamEntry" id="inviteAccept' + data.invites[i].id + '">Godta</i> - <i class="teamEntry" id="inviteDecline' + data.invites[i].id + '">Avslå</i></div>');
+	    $("#inviteAccept" + data.invites[i].id).click({inviteId: data.invites[i].id}, function(e){
+		acceptInvite(e.data.inviteId);
+	    });
+	    $("#inviteDecline" + data.invites[i].id).click({inviteId: data.invites[i].id}, function(e){
+		declineInvite(e.data.inviteId);
+	    });
+	    $("#teamInviteId" + data.invites[i].clanData.id).click({teamId: data.invites[i].clanData.id}, function(e){
+		window.location="index.php?page=team&id=" + e.data.teamId
+	    });
+	}
+    }, false);
+    clanListTask.start();
 }
 
 function renderBanner() {

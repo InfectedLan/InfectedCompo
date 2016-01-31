@@ -95,6 +95,17 @@
 			    invitedPeople++;
 			    if(invitedPeople==invitedUserId.length) {
 				info("Clanen ble registrert!", function() {window.location = "index.php?page=team&id=" + clanId});
+				noty({
+				    text: "Clanen ble registrert!",
+				    type: 'information',
+				    layout: 'center',
+				    callback: {
+					onClose: function() {
+					    window.location = "index.php#clan-" + clanId;
+					}
+				    },
+				    timeout: 3000
+				});
 				console.log("Clan is registered!");
 			    }
 			});

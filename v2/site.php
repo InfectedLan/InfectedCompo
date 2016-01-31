@@ -40,8 +40,10 @@ class Site {
     echo '<script src="../api/scripts/jquery.ba-hashchange.min.js"></script>';
 	echo '<script src="../api/scripts/login.js"></script>';
 	echo '<script src="../api/scripts/logout.js"></script>';
-	echo '<script src="../api/scripts/three.min.js"></script>';
-	echo '<script src="../api/scripts/SPE.min.js"></script>';
+	// These two are used by the 3d wallpaper, so we'll disable them to make stuff faster.
+ 	//echo '<script src="../api/scripts/three.min.js"></script>';
+	//echo '<script src="../api/scripts/SPE.min.js"></script>';
+	echo '<script src="../api/scripts/jquery.noty.packaged.min.js"></script>';
 
 	//Custom javascripts. This HAS to be included after jquery
 	echo '<script src="scripts/shared.js"></script>';

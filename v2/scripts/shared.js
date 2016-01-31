@@ -31,28 +31,50 @@ function info(errorMsg) {
 }
 */
 function error(errorMsg, func) {
-	$('#errorMsg').text(errorMsg);
-	if(typeof func === "undefined")
-	{
-		errorFunction = 0;
-	}
-	else
-	{
-		errorFunction = func;
-	}
-	showErrorBox();
+    if(typeof func === "undefined")
+    {
+	noty({
+	    text: errorMsg,
+	    type: 'error',
+	    layout: 'center',
+	    timeout: 7000
+	});
+    }
+    else
+    {
+	noty({
+	    text: errorMsg,
+	    type: 'error',
+	    layout: 'center',
+	    callback: {
+		onClose: func
+	    },
+	    timeout: 7000
+	});
+    }
 }
 function info(errorMsg, func) {
-	$('#errorMsg').text(errorMsg);
-	if(typeof func === "undefined")
-	{
-		errorFunction = 0;
-	}
-	else
-	{
-		errorFunction = func;
-	}
-	showInfoBox();
+    if(typeof func === "undefined")
+    {
+	noty({
+	    text: errorMsg,
+	    type: 'information',
+	    layout: 'center',
+	    timeout: 7000
+	});
+    }
+    else
+    {
+	noty({
+	    text: errorMsg,
+	    type: 'information',
+	    layout: 'center',
+	    callback: {
+		onClose: func
+	    },
+	    timeout: 7000
+	});
+    }
 }
 function hideErrorBox() {
 	$("#errorbox").fadeOut(200);
