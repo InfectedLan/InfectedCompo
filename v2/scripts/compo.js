@@ -503,7 +503,7 @@ function renderClanList() {
 		console.log("We have a clan. We will use the first one as the chattable clan");
 		for(var i = 0; i < datastore["compoList"].length; i++) {
 		    if(datastore["clanList"].clans[0].id == datastore["compoList"][i].id) {
-			$("#chatBox").prepend('<div class="boxTitle"><p class="boxTitleText">Chat - ' + datastore["compoList"][i].name + '</p></div>');
+			$("#chatBox").prepend('<div class="boxTitle"><p class="boxTitleText">Chat - ' + datastore["compoList"][i].title + '</p></div>');
 			Chat.bindChat("chatContainer", datastore["compoList"][i].chat, 415);
 			hasRenderedChat = true;
 			return;
