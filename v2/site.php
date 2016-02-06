@@ -48,6 +48,8 @@ class Site {
 	//Custom javascripts. This HAS to be included after jquery
 	echo '<script src="scripts/shared.js"></script>';
     echo '<script src="scripts/compo.js"></script>';
+    echo '<script src="../api/scripts/websocket.js"></script>';
+    echo '<script src="../api/scripts/chat.js"></script>';
     echo '<script>var loggedIn = ' . (Session::isAuthenticated() ? "true" : "false") . ';</script>';
 	//echo '<script src="scripts/background.js"></script>';
         /*

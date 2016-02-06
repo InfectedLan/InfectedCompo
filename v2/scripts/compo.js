@@ -251,8 +251,11 @@ DownloadDatastoreTask.prototype.start = function() {
 	    this.downloadMaster.success(this);
 	}
     } else if(typeof(downloadingDatastores[this.name]) !== "undefined") { //Checks if we have a download going for it
-	console.log("Allready downloading data, putting this function in the finished queue");
-	downloadingDatastores[this.name].push(this.onFinished);
+	console.log("Allready downloading data, putting this function in the finished queue: " + this.url);
+	var _this = this;
+	if(typeof(this.onFinished) !== "undefined") {
+	    downloadingDatastores[this.name].push(this.onFinished);
+	}
 	if(typeof(this.downloadMaster) !== "undefined") {
 	    var _this = this;
 	    downloadingDatastores[this.name].push(function() {
@@ -262,24 +265,24 @@ DownloadDatastoreTask.prototype.start = function() {
     } else {
 	console.log("Downloading new datastore " + this.url + ".");
 	downloadingDatastores[this.name] = [];
-	var _this = this;
+	var _thiss = this;
 	$.getJSON(this.url, function(data){
-	    console.log("Done downloading " + _this.url);
+	    console.log("Done downloading " + _thiss.url);
 	    if(data.result == true)
 	    {
-		datastore[_this.name] = data.data;
-		_this.onFinished(data.data);
+		datastore[_thiss.name] = data.data;
+		_thiss.onFinished(data.data);
 		//Run other download functions
-		for(var i = 0; i < downloadingDatastores[_this.name].length; i++) {
-		    downloadingDatastores[_this.name][i](data.data);
+		for(var i = 0; i < downloadingDatastores[_thiss.name].length; i++) {
+		    downloadingDatastores[_thiss.name][i](data.data);
 		}
-		delete downloadingDatastores[_this.name];
-		if(typeof(_this.downloadMaster) !== "undefined") {
-		    _this.downloadMaster.success(_this);
+		delete downloadingDatastores[_thiss.name];
+		if(typeof(_thiss.downloadMaster) !== "undefined") {
+		    _thiss.downloadMaster.success(_thiss);
 		}
 	    } else {
-		if(typeof(_this.downloadMaster) !== "undefined") {
-		    _this.downloadMaster.fail(_this);
+		if(typeof(_thiss.downloadMaster) !== "undefined") {
+		    _thiss.downloadMaster.fail(_thiss);
 		}
 	    }
 	});
@@ -301,7 +304,7 @@ var PageDownloadWaiter = function(tasks, doneEvent) {
 };
 
 PageDownloadWaiter.prototype.start = function() {
-    console.log("Starting downloads");
+    console.log("PageDownloadWaiter started from " + arguments.callee.caller.toString());
     for(var i = 0; i < this.tasks.length; i++) {
 	this.tasks[i].start();
     }
@@ -341,6 +344,7 @@ var pages = {index: new IndexPage(), compo: new CompoPage(), newTeam: new NewTea
 var currentPage = "login";
 var datastore = {}; //This is where we store data we have downloaded
 var downloadingDatastores = {};
+var hasRenderedChat = false;
 
 //Startup
 console.log("Infected compo booting up!");
@@ -352,6 +356,7 @@ $(document).ready(function(){
 	currentPage = login;
 	login.render();
     } else {
+	Chat.init();
 	renderSidebar();
 	if(location.hash.length>0) {
 	    if(typeof(pages[location.hash.substring(1).split("-")[0]]) !== 'undefined') {
@@ -491,7 +496,25 @@ function renderClanList() {
 	    });
 	}
     }, false);
-    clanListTask.start();
+    var acompoListTask = new DownloadDatastoreTask("../api/json/compo/getCompos.php", "compoList");
+    var chatDownloadManager = new PageDownloadWaiter([acompoListTask, clanListTask], function() {
+	if(!hasRenderedChat) {
+	    if(datastore["clanList"].clans.length>0) {
+		console.log("We have a clan. We will use the first one as the chattable clan");
+		for(var i = 0; i < datastore["compoList"].length; i++) {
+		    if(datastore["clanList"].clans[0].id == datastore["compoList"][i].id) {
+			$("#chatBox").prepend('<div class="boxTitle"><p class="boxTitleText">Chat - ' + datastore["compoList"][i].name + '</p></div>');
+			Chat.bindChat("chatContainer", datastore["compoList"][i].chat, 415);
+			hasRenderedChat = true;
+			return;
+		    }
+		}
+	    }
+	}
+    });
+    console.log("Starting clan list downloader");
+    chatDownloadManager.start();
+    console.log("done");
 }
 
 function renderBanner() {

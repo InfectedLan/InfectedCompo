@@ -37,7 +37,7 @@ function error(errorMsg, func) {
 	    text: errorMsg,
 	    type: 'error',
 	    layout: 'center',
-	    timeout: 7000
+	    timeout: 30000
 	});
     }
     else
@@ -49,7 +49,7 @@ function error(errorMsg, func) {
 	    callback: {
 		onClose: func
 	    },
-	    timeout: 7000
+	    timeout: 30000
 	});
     }
 }
@@ -60,7 +60,7 @@ function info(errorMsg, func) {
 	    text: errorMsg,
 	    type: 'information',
 	    layout: 'center',
-	    timeout: 7000
+	    timeout: 30000
 	});
     }
     else
@@ -72,7 +72,7 @@ function info(errorMsg, func) {
 	    callback: {
 		onClose: func
 	    },
-	    timeout: 7000
+	    timeout: 30000
 	});
     }
 }
