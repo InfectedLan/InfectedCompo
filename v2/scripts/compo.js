@@ -304,7 +304,6 @@ var PageDownloadWaiter = function(tasks, doneEvent) {
 };
 
 PageDownloadWaiter.prototype.start = function() {
-    console.log("PageDownloadWaiter started from " + arguments.callee.caller.toString());
     for(var i = 0; i < this.tasks.length; i++) {
 	this.tasks[i].start();
     }
