@@ -93,7 +93,7 @@ var ClanPage = function() {
 };
 
 ClanPage.prototype = Object.create(Page.prototype);
-ClanPage.prototype.constructor = CompoPage;
+ClanPage.prototype.constructor = ClanPage;
 ClanPage.prototype.render = function() {
     $("#mainContent").html(clan_html);
     console.log("Starting downloads for clanPage");
@@ -199,7 +199,10 @@ CompoPage.prototype.render = function() {
 	    $("#mainContent").find("ul").first().append("<li>ayoo</li>");
 	}
 	*/
-	$("#mainContent").fadeIn(300);
+	loadCompoPlugin(currentCompoId, function() {
+	    compoPlugins[currentCompoId].decorateCompoPage();
+	    $("#mainContent").fadeIn(300);
+	});
     });
     downloadManager.start();
     return false;
@@ -229,6 +232,24 @@ NewTeamPage.prototype.render = function() {
 	});
     });
     compoListTask.start();
+    return false;
+};
+
+/*****************************************************
+ * Current match page
+ */
+
+var CurrentMatchPage = function() {
+    Page.call(this);
+};
+
+CurrentMatchPage.prototype = Object.create(Page.prototype);
+CurrentMatchPage.prototype.constructor = NewTeamPage;
+CurrentMatchPage.prototype.render = function() {
+    var userDataTask = new DownloadDatastoreTask("../api/json/user/getUserData.php", "userData", function(data){
+	Match.renderSite(true);
+	$("#content").fadeIn(300);
+    });
     return false;
 };
 
@@ -339,10 +360,11 @@ function getDatastore(url, name, onFetch){
  * Page bookkeeping
  */
 
-var pages = {index: new IndexPage(), compo: new CompoPage(), newTeam: new NewTeamPage(), clan: new ClanPage()};
+var pages = {index: new IndexPage(), compo: new CompoPage(), newTeam: new NewTeamPage(), clan: new ClanPage(), currentMatch: new CurrentMatchPage()};
 var currentPage = "login";
 var datastore = {}; //This is where we store data we have downloaded
 var downloadingDatastores = {};
+var compoPlugins = [];
 var hasRenderedChat = false;
 
 //Startup
@@ -355,6 +377,7 @@ $(document).ready(function(){
 	currentPage = login;
 	login.render();
     } else {
+	renderChat();
 	Chat.init();
 	renderSidebar();
 	if(location.hash.length>0) {
@@ -390,6 +413,10 @@ var getUniqueId = (function(){
     };
 })();
 
+function getPageName() {
+    return location.hash.substring(1).split("-")[0];
+}
+
 /*****************************************************
  * Page handling
  */
@@ -423,6 +450,7 @@ function gotoPage(hashId) {
 	});
     }
     renderBanner(); //Update the banner selected state
+    Match.init();
 }
 
 function refresh() {
@@ -456,46 +484,67 @@ function renderSidebar() {
 }
 
 function renderClanList() {
-    var clanListTask = new DownloadDatastoreTask("../api/json/compo/getCompoStatus.php", "clanList", function(data){
-	//Add teams
-	$("#teamData").html("");
-	for(var i = 0; i < data.clans.length; i++) {
-	    $("#teamData").append('<div class="teamEntry" id="teamHeaderId' + data.clans[i].id + '"><h1>' + data.clans[i].tag + '</h1><h3> - ' + data.clans[i].compo.tag + '</h3>');
-	    $("#teamHeaderId" + data.clans[i].id).click({teamId: data.clans[i].id}, function(e){window.location="index.php#clan-" + e.data.teamId});
-	}
-	//Render invites
-	var acceptInvite = function(inviteId) {
-	    $.getJSON('../api/json/invite/acceptInvite.php?id=' + encodeURIComponent(inviteId), function(data){
-		if(data.result) {
-		    renderClanList();
-		} else {
-		    error(data.message);
-		}
-	    });
-	}
-	var declineInvite = function(inviteId) {
-	    $.getJSON('../api/json/invite/declineInvite.php?id=' + encodeURIComponent(inviteId), function(data){
-		if(data.result) {
-		    renderClanList();
-		} else {
-		    error(data.message);
-		}
-	    });
-	}
-	for(var i = 0; i < data.invites.length; i++) {
-	    $("#teamData").append('<div class="teamEntry" id="teamHeaderId' + data.invites[i].clanData.id + '"><h1>' + data.invites[i].clanData.tag + '</h1><h3> - ' + data.invites[i].compo.tag + '</h3><br /><i class="teamEntry" id="inviteAccept' + data.invites[i].id + '">Godta</i> - <i class="teamEntry" id="inviteDecline' + data.invites[i].id + '">Avslå</i></div>');
-	    $("#inviteAccept" + data.invites[i].id).click({inviteId: data.invites[i].id}, function(e){
-		acceptInvite(e.data.inviteId);
-	    });
-	    $("#inviteDecline" + data.invites[i].id).click({inviteId: data.invites[i].id}, function(e){
-		declineInvite(e.data.inviteId);
-	    });
-	    $("#teamInviteId" + data.invites[i].clanData.id).click({teamId: data.invites[i].clanData.id}, function(e){
-		window.location="index.php?page=team&id=" + e.data.teamId
-	    });
-	}
-    }, false);
-    var acompoListTask = new DownloadDatastoreTask("../api/json/compo/getCompos.php", "compoList");
+    //We need to have the user data before we can do anything, as we need to know if the user has accepted a match or not. We can not allways guarantee the user data to be here before WS data.
+    if(Match.isInMatch()) {
+	var userDataTask = new DownloadDatastoreTask("../api/json/user/getUserData.php", "userData", function(data){
+	    if(Match.shouldAcceptMatch(data.id)) {
+		$("#teamData").html("<center><h1 style='top: -10px;'>Game ready</h1></center><p id='smallAccept' class='acpt acptSmall'>ACCEPT</p>");
+		$("#addTeam").hide();
+		$("#smallAccept").click(/*{matchId: data.matchData.id}, */function(e) {
+		    //acceptMatch(e.data.matchId);
+		    Match.acceptMatch();
+		});
+	    }	
+	});
+	userDataTask.start(); //Ensure we have user data.
+    } else {
+	var clanListTask = new DownloadDatastoreTask("../api/json/compo/getCompoStatus.php", "clanList", function(data){
+	    //Add teams
+	    $("#teamData").html("");
+	    for(var i = 0; i < data.clans.length; i++) {
+		$("#teamData").append('<div class="teamEntry" id="teamHeaderId' + data.clans[i].id + '"><h1>' + data.clans[i].tag + '</h1><h3> - ' + data.clans[i].compo.tag + '</h3>');
+		$("#teamHeaderId" + data.clans[i].id).click({teamId: data.clans[i].id}, function(e){window.location="index.php#clan-" + e.data.teamId});
+	    }
+	    //Render invites
+	    var acceptInvite = function(inviteId) {
+		$.getJSON('../api/json/invite/acceptInvite.php?id=' + encodeURIComponent(inviteId), function(data){
+		    if(data.result) {
+			renderClanList();
+		    } else {
+			error(data.message);
+		    }
+		});
+	    }
+	    var declineInvite = function(inviteId) {
+		$.getJSON('../api/json/invite/declineInvite.php?id=' + encodeURIComponent(inviteId), function(data){
+		    if(data.result) {
+			renderClanList();
+		    } else {
+			error(data.message);
+		    }
+		});
+	    }
+	    for(var i = 0; i < data.invites.length; i++) {
+		$("#teamData").append('<div class="teamEntry" id="teamHeaderId' + data.invites[i].clanData.id + '"><h1>' + data.invites[i].clanData.tag + '</h1><h3> - ' + data.invites[i].compo.tag + '</h3><br /><i class="teamEntry" id="inviteAccept' + data.invites[i].id + '">Godta</i> - <i class="teamEntry" id="inviteDecline' + data.invites[i].id + '">Avslå</i></div>');
+		$("#inviteAccept" + data.invites[i].id).click({inviteId: data.invites[i].id}, function(e){
+		    acceptInvite(e.data.inviteId);
+		});
+		$("#inviteDecline" + data.invites[i].id).click({inviteId: data.invites[i].id}, function(e){
+		    declineInvite(e.data.inviteId);
+		});
+		$("#teamInviteId" + data.invites[i].clanData.id).click({teamId: data.invites[i].clanData.id}, function(e){
+		    window.location="index.php?page=team&id=" + e.data.teamId
+		});
+	    }
+	    $("#addTeam").show();
+	}, false);
+	clanListTask.start();
+    }
+}
+
+function renderChat() {
+    var acompoListTask = new DownloadDatastoreTask("../api/json/compo/getCompos.php", "compoList", function() {});
+    var clanListTask = new DownloadDatastoreTask("../api/json/compo/getCompoStatus.php", "clanList", function() {});
     var chatDownloadManager = new PageDownloadWaiter([acompoListTask, clanListTask], function() {
 	if(!hasRenderedChat) {
 	    if(datastore["clanList"].clans.length>0) {
@@ -511,10 +560,8 @@ function renderClanList() {
 	    }
 	}
     });
-    console.log("Starting clan list downloader");
     chatDownloadManager.start();
-    console.log("done");
-}
+};
 
 function renderBanner() {
     var compoListTask = new DownloadDatastoreTask("../api/json/compo/getCompos.php", "compoList", function(data){
@@ -531,6 +578,13 @@ function renderBanner() {
 		window.location = "index.php#compo-"+event.data.compo.id;
 	    });
 	}
+	if(Match.isInMatch()) {
+	    $("#banner").append('<div id="compoBtnCurr" class="gameType ' + (getPageName() == "currentMatch" ? ' selected' : '') + '"><p>Current match</p></div>');
+	    $("#compoBtnCurr").click(function(event) {
+		window.location = "index.php#currentMatch";
+	    });
+	    
+	}
     });
     compoListTask.start();
 }
@@ -545,4 +599,32 @@ function getQueryVariable(variable) {
 	}
     } 
     return null;
+}
+
+function getCompoData(compoId) {
+    for(var i = 0; i < datastore["compoList"].length; i++) {
+	if(datastore["compoList"][i].id == compoId) {
+	    return datastore["compoList"][i];
+	}
+    }
+}
+
+function loadCompoPlugin(compoId, onDone) {
+    if(typeof(compoPlugins[compoId]) !== "undefined") {
+	if(typeof(onDone) !== "undefined") {
+	    onDone();
+	}
+	return;
+    }
+    var data = getCompoData(compoId);
+    $.getScript("../api/plugins/compo/" + data.pluginJavascript.compoPlugin).done(function(script, status) {
+	//Move the plugin to a permanent place once the script is evaluated
+	compoPlugins[data.id] = module;
+	delete module;
+	if(typeof(onDone) !== "undefined") {
+	    onDone();
+	}
+    }).fail(function(jqxhr, settings, exception) {
+	console.log(exception);
+    });
 }
