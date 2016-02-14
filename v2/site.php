@@ -48,6 +48,7 @@ class Site {
 	//Custom javascripts. This HAS to be included after jquery
 	echo '<script src="../api/scripts/websocket.js"></script>';
 	echo '<script src="../api/scripts/chat.js"></script>';
+	echo '<script src="../api/scripts/bracket.js"></script>';
 	echo '<script src="scripts/match.js"></script>';
 	echo '<script src="scripts/shared.js"></script>';
 	echo '<script src="scripts/compo.js"></script>';
