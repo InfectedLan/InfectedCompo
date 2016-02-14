@@ -200,7 +200,7 @@ CompoPage.prototype.render = function() {
 	}
 	*/
 	loadCompoPlugin(currentCompoId, function() {
-	    compoPlugins[currentCompoId].decorateCompoPage();
+	    compoPlugins[currentCompoId].decorateCompoPage(compo);
 	    $("#mainContent").fadeIn(300);
 	});
     });
@@ -244,12 +244,13 @@ var CurrentMatchPage = function() {
 };
 
 CurrentMatchPage.prototype = Object.create(Page.prototype);
-CurrentMatchPage.prototype.constructor = NewTeamPage;
+CurrentMatchPage.prototype.constructor = CurrentMatchPage;
 CurrentMatchPage.prototype.render = function() {
     var userDataTask = new DownloadDatastoreTask("../api/json/user/getUserData.php", "userData", function(data){
 	Match.renderSite(true);
-	$("#content").fadeIn(300);
+	$("#mainContent").fadeIn(300);
     });
+    userDataTask.start();
     return false;
 };
 
@@ -377,6 +378,7 @@ $(document).ready(function(){
 	currentPage = login;
 	login.render();
     } else {
+	Match.init();
 	renderChat();
 	Chat.init();
 	renderSidebar();
@@ -437,6 +439,7 @@ function gotoPage(hashId) {
 	if(result) {
 	    $("#mainContent").fadeIn(300);
 	}
+	Match.init();
     } else {
 	pages[currentPage].onDeInit();
 	pages[hashId].onInit();
@@ -450,7 +453,6 @@ function gotoPage(hashId) {
 	});
     }
     renderBanner(); //Update the banner selected state
-    Match.init();
 }
 
 function refresh() {
@@ -494,7 +496,10 @@ function renderClanList() {
 		    //acceptMatch(e.data.matchId);
 		    Match.acceptMatch();
 		});
-	    }	
+	    }	else {
+		$("#teamData").html("<center><h1>Gamet ditt er klart!</h1>Vennligst gå <a href='index.php#currentMatch'>hit</a> for å starte</center>");
+		$("#addTeam").remove();
+	    }
 	});
 	userDataTask.start(); //Ensure we have user data.
     } else {
@@ -550,7 +555,7 @@ function renderChat() {
 	    if(datastore["clanList"].clans.length>0) {
 		console.log("We have a clan. We will use the first one as the chattable clan");
 		for(var i = 0; i < datastore["compoList"].length; i++) {
-		    if(datastore["clanList"].clans[0].id == datastore["compoList"][i].id) {
+		    if(datastore["clanList"].clans[0].compo.id == datastore["compoList"][i].id) {
 			$("#chatBox").prepend('<div class="boxTitle"><p class="boxTitleText">Chat - ' + datastore["compoList"][i].title + '</p></div>');
 			Chat.bindChat("chatContainer", datastore["compoList"][i].chat, 415);
 			hasRenderedChat = true;
@@ -619,9 +624,11 @@ function loadCompoPlugin(compoId, onDone) {
     var data = getCompoData(compoId);
     $.getScript("../api/plugins/compo/" + data.pluginJavascript.compoPlugin).done(function(script, status) {
 	//Move the plugin to a permanent place once the script is evaluated
+	console.log("Done downloading compo data!");
 	compoPlugins[data.id] = module;
 	delete module;
 	if(typeof(onDone) !== "undefined") {
+	    console.log("done");
 	    onDone();
 	}
     }).fail(function(jqxhr, settings, exception) {

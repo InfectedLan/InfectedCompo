@@ -6,7 +6,7 @@ var Match = (function(){
 	var readyData = currMatchData.readyData;
 	var acceptScreenLayout = [];
 	acceptScreenLayout.push('<br /><br />');
-	if(!matchObj.hasAccepted(data)) {
+	if(matchObj.shouldAcceptMatch(datastore["userData"].id)) {
 	    acceptScreenLayout.push('<p id="matchAcceptBtn" class="acpt acptLarge">ACCEPT</p>');
 	} else {
 
@@ -48,7 +48,7 @@ var Match = (function(){
 	$("#matchArea").html(acceptScreenLayout.join(""));
 
 	$("#matchAcceptBtn").click(function(e) {
-	    Match.acceptMatch(matchId);
+	    Match.acceptMatch(currMatchData.id);
 	});
     };
 
@@ -75,15 +75,15 @@ var Match = (function(){
 	if(shouldRedrawMainContent) {
 	    $("#mainContent").html('<div id="matchArea"></div><div id="chatArea"></div>');
 	    $("#chatArea").html('<h3>Chat - Match (Her kan alle chatte)</h3><div id="compoChatField"></div>');
-	    Chat.bindChat('#chatArea', currMatchData.chat, 300);
+	    Chat.bindChat('compoChatField', currMatchData.chatId, 300);
 	}
-	loadCompoPlugin(currMatchData.id, function() {
+	loadCompoPlugin(currMatchData.compoId, function() {
 	    if(currMatchData.state == 0) {
 		renderReadyScreen();
 	    } else if(currMatchData.state == 1) {
-		compoPlugins[currMatchData.id].renderCustomScreen(currMatchData);
+		compoPlugins[currMatchData.compoId].renderCustomScreen(currMatchData);
 	    } else if(currMatchData.state == 2) {
-		compoPlugins[currMatchData.id].renderGameScreen(currMatchData);
+		compoPlugins[currMatchData.compoId].renderGameScreen(currMatchData);
 	    }
 	});
     };
@@ -117,9 +117,10 @@ var Match = (function(){
 	    return false;
 	}
 	for(var i = 0; i < currMatchData.readyData.length; i++) {
-	    for(var x = 0; x < currMatchData.readyData[i].length; x++) {
-		if(currMatchData.readyData[i][x].userId == meId) {
-		    return !currMatchData.readyData[i][x].ready;
+	    for(var x = 0; x < currMatchData.readyData[i].members.length; x++) {
+		if(currMatchData.readyData[i].members[x].userId == meId) {
+		    console.log(currMatchData.readyData[x].members[x].userId);
+		    return !currMatchData.readyData[i].members[x].ready;
 		}
 	    }
 	}
