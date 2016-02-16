@@ -253,6 +253,10 @@ CurrentMatchPage.prototype.render = function() {
     userDataTask.start();
     return false;
 };
+CurrentMatchPage.prototype.onDeInit = function() {
+    console.log("Unsubscribing to chatroom");
+    Match.handleUnload();
+};
 
 /*****************************************************
  * Download manager
@@ -495,9 +499,10 @@ function renderClanList() {
 		$("#smallAccept").click(/*{matchId: data.matchData.id}, */function(e) {
 		    //acceptMatch(e.data.matchId);
 		    Match.acceptMatch();
+		    window.location = "index.php#currentMatch";
 		});
 	    }	else {
-		$("#teamData").html("<center><h1>Gamet ditt er klart!</h1>Vennligst gå <a href='index.php#currentMatch'>hit</a> for å starte</center>");
+		$("#teamData").html("<center><h1>Gamet ditt er klart!</h1> Vennligst gå <a href='index.php#currentMatch'>hit</a> for å starte</center>");
 		$("#addTeam").remove();
 	    }
 	});

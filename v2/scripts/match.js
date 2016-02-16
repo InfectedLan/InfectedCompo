@@ -1,6 +1,7 @@
 var Match = (function(){
     var matchObj = {};
     var currMatchData = null;
+    var hasDrawnMatchScreen = false;
 
     var renderReadyScreen = function() { //This is the same on all plugins
 	var readyData = currMatchData.readyData;
@@ -72,10 +73,11 @@ var Match = (function(){
 	    $("#mainContent").html("<h1>Det er ingen nåværende matcher</h1>");
 	    return;
 	}
-	if(shouldRedrawMainContent) {
+	if(shouldRedrawMainContent || !hasDrawnMatchScreen) {
 	    $("#mainContent").html('<div id="matchArea"></div><div id="chatArea"></div>');
 	    $("#chatArea").html('<h3>Chat - Match (Her kan alle chatte)</h3><div id="compoChatField"></div>');
 	    Chat.bindChat('compoChatField', currMatchData.chatId, 300);
+	    hasDrawnMatchScreen = true;
 	}
 	loadCompoPlugin(currMatchData.compoId, function() {
 	    if(currMatchData.state == 0) {
@@ -86,6 +88,10 @@ var Match = (function(){
 		compoPlugins[currMatchData.compoId].renderGameScreen(currMatchData);
 	    }
 	});
+    };
+
+    matchObj.handleUnload = function() {
+	Chat.unbindChat('compoChatField');
     };
 
     matchObj.isInMatch = function() {
