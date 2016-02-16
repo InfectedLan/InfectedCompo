@@ -3,6 +3,11 @@ var Match = (function(){
     var currMatchData = null;
     var hasDrawnMatchScreen = false;
 
+    //Constants
+    matchObj.CONNECTION_TYPE_NONE = 0;
+    matchObj.CONNECTION_TYPE_SERVER = 1;
+    matchObj.CONNECTION_TYPE_CUSTOM = 2;
+
     var renderReadyScreen = function() { //This is the same on all plugins
 	var readyData = currMatchData.readyData;
 	var acceptScreenLayout = [];
@@ -73,6 +78,7 @@ var Match = (function(){
 	    $("#mainContent").html("<h1>Det er ingen nåværende matcher</h1>");
 	    return;
 	}
+	console.log("Should redraw main content? " + shouldRedrawMainContent + ". Has drawn match screen?" + hasDrawnMatchScreen);
 	if(shouldRedrawMainContent || !hasDrawnMatchScreen) {
 	    $("#mainContent").html('<div id="matchArea"></div><div id="chatArea"></div>');
 	    $("#chatArea").html('<h3>Chat - Match (Her kan alle chatte)</h3><div id="compoChatField"></div>');

@@ -399,6 +399,7 @@ $(document).ready(function(){
 });
 
 $(window).hashchange(function(){
+    console.log("Hash change");
     if(location.hash.length>0) {
 	if(typeof(pages[location.hash.substring(1).split("-")[0]]) !== 'undefined') {
 	    gotoPage(location.hash.substring(1).split("-")[0]);
@@ -428,7 +429,7 @@ function getPageName() {
  */
 
 function gotoPage(hashId) {
-    console.log("going to page");
+    console.log("going to page " + hashId);
     if(typeof(pages[hashId]) === 'undefined') {
 	console.log("Tried to navigate to non-existing page: " + hashId);
 	return;
