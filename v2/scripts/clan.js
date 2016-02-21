@@ -99,8 +99,9 @@
 			var user = data.users[i];
 			var displayName = data.users[i].firstname + ' "' + data.users[i].nickname + '" ' + data.users[i].lastname;
 			$('#searchResultsResultPane').append("<b>" + displayName + '</b> <input class="inviteBtn" type="button" value="Inviter" /><br />');
-			$("#searchResultsResultPane").find('.inviteBtn').last().on('click', function() {
-			    inviteUser(user.id, displayName);
+			
+			$("#searchResultsResultPane").find('.inviteBtn').last().on('click', {userId: user.id}, function(data) {
+			    inviteUser(data.data.userId, displayName);
 			});
 		    }
 		}
