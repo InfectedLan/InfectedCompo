@@ -29,12 +29,19 @@ if(isset($_GET['id'])) {
 	echo '<script src="../api/scripts/bracket.js"></script>';
 
 	$compo = CompoHandler::getCompo($_GET['id']);
+    echo '<script>var source = new DataSource(' . $compo->getId() . ');</script>';
+    echo '<script>';
+    echo 'var participant_type_clan = ' . Settings::compo_match_participant_type_clan . ';';
+    echo 'var participant_type_winner = ' . Settings::compo_match_participant_type_match_winner . ';';
+    echo 'var participant_type_looser = ' . Settings::compo_match_participant_type_match_looser . ';';
+    echo 'var participant_type_walkover = ' . Settings::compo_match_participant_type_match_walkover . ';';
+    echo '</script>';
 
 	echo '<h1>' . $compo->getName() . '</h1>';
 
 	if (CompoHandler::hasGeneratedMatches($compo)) {
-		echo '<div class="bracket_container" id="bracket_container"></div>';
-		echo '<script>createBracketRenderer("bracket_container", ' . $compo->getId() . ');</script>';
+		echo '<div class="bracket_container" id="bracket_container"></div><br />';
+		echo '<script>var bracket = source.derive("bracket_container", ".*");</script>';
 	}
 
 	echo '<br />';

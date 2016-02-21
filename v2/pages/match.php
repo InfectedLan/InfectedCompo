@@ -23,4 +23,7 @@ require_once 'handlers/compohandler.php';
 require_once 'handlers/eventhandler.php';
 
 $user = Session::getCurrentUser();
+
+echo '<div id="matchArea"></div>';
+echo '<div id="chatArea"></div>';
 ?>

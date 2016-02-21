@@ -35,19 +35,19 @@ class Site {
 			    echo '<link rel="stylesheet" type="text/css" href="../api/styles/bracket.css">';
 			    echo '<link rel="stylesheet" type="text/css" href="../api/styles/chat.css">';
 				echo '<link href="../api/styles/jquery-ui-1.11.1.css" rel="stylesheet" type="text/css" />';
-				echo '<script src="../api/scripts/jquery-1.11.1.min.js"></script>';
+				echo '<script src="../api/scripts/jquery-1.11.3.min.js"></script>';
 				echo '<script src="../api/scripts/jquery-ui-1.11.1.min.js"></script>';
 				echo '<script src="../api/scripts/login.js"></script>';
 				echo '<script src="../api/scripts/logout.js"></script>';
 
 				//Custom javascripts. This HAS to be included after jquery
 				echo '<script src="scripts/shared.js"></script>';
-                /*
+                
                 if(Session::isAuthenticated()) {
                     echo '<script src="../api/scripts/chat.js"></script>';
-                    echo '<script>Chat.init(); $(document).ready(function() {Chat.bindChat("chatContainer", 1, 415);});</script>';
+                    echo '<script>Chat.init();</script>';
                 }
-                */
+                
 				echo "<script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create', 'UA-54254513-4', 'auto');ga('send', 'pageview');</script>";
 			echo '</head>';
 
@@ -98,9 +98,18 @@ class Site {
 				                echo '<p id="addTeam"><span style="font-size:20px; margin-top:-15px;">+</span> Add Team</p>';
 				            echo '</div>';
 				            echo '<div id="chatBox">';
-				            echo '<div class="boxTitle"><p class="boxTitleText">Chat - Global</p></div>';
+                            $clans = ClanHandler::getClansByUser($user);
+                            foreach($clans as $clan) {
+                                if(ClanHandler::isQualified($clan, $clan->getCompo())) {
+                                    $compo = $clan->getCompo();
+                                    echo '<div class="boxTitle"><p class="boxTitleText">Chat - ' . $compo->getName() . '</p></div>';
+                                    break;
+                                }
+                            }
 				            echo '<div id="chatContainer"></div>';
 				            echo '</div>';
+                            
+                            echo '<script>$(document).ready(function() {Chat.bindChat("chatContainer", ' . $compo->getChat()->getId() . ', 415);});</script>';
 				        echo '</div>';
 				        echo '<div id="rightColumn">';
 				            echo '<div id="banner">';
@@ -175,9 +184,9 @@ class Site {
 	}
 
 	private function viewPage($pageName) {
-		$directoryList = array(Settings::api_path . 'pages',
-							   'pages');
-		$includedPages = array();
+		$directoryList = [Settings::api_path . 'pages',
+							   			'pages'];
+		$includedPages = [];
 		$found = false;
 
 		foreach ($directoryList as $directory) {
@@ -187,7 +196,7 @@ class Site {
 				in_array($filePath, glob($directory . '/*.php'))) {
 				// Make sure we don't include pages with same name twice,
 				// and set the found varialbe so that we don't have to display the not found message.
-				array_push($includedPages, $pageName);
+			  $includedPages[] = $pageName;
 				$found = true;
 
 				include_once $filePath;
