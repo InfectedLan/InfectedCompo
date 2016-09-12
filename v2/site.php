@@ -31,13 +31,14 @@ class Site {
 	echo '<head>';
 	echo '<title>' . $this->getTitle() . '</title>';
 	echo '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
-	echo '<link rel="stylesheet" type="text/css" href="../api/styles/compo.css">';
+	echo '<link rel="stylesheet" type="text/css" href="styles/style.css">';
 	echo '<link rel="stylesheet" type="text/css" href="../api/styles/bracket.css">';
 	echo '<link rel="stylesheet" type="text/css" href="../api/styles/chat.css">';
 	echo '<link href="../api/styles/jquery-ui-1.11.1.css" rel="stylesheet" type="text/css" />';
 	echo '<script src="../api/scripts/jquery-1.11.3.min.js"></script>';
 	echo '<script src="../api/scripts/jquery-ui-1.11.1.min.js"></script>';
-	echo '<script src="../api/scripts/jquery.ba-hashchange.min.js"></script>';
+	//Fixed due to old source(2010, does not support our jquery version). This was only needed for ie support iirc. ie is outdated, so not our issue if users are using abandoned browsers.
+	//echo '<script src="../api/scripts/jquery.ba-hashchange.min.js"></script>';
 	echo '<script src="../api/scripts/login.js"></script>';
 	echo '<script src="../api/scripts/logout.js"></script>';
 	// These two are used by the 3d wallpaper, so we'll disable them to make stuff faster.
@@ -51,46 +52,10 @@ class Site {
 	echo '<script src="../api/scripts/bracket.js"></script>';
 	echo '<script src="../api/scripts/match.js"></script>';
 	echo '<script src="scripts/shared.js"></script>';
-	echo '<script src="../api/scripts/compo.js"></script>';
+	echo '<script src="scripts/compo.js"></script>';
+	echo '<script>var api_path = "../api/";var websocketEnabled = false;</script>';
 	echo '<script>var loggedIn = ' . (Session::isAuthenticated() ? "true" : "false") . ';</script>';
 	echo "<script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create', 'UA-54254513-4', 'auto');ga('send', 'pageview');</script>";
-	echo '<script>var api_path = "../api/";console.log("Infected compo booting up!");
-
-$(document).ready(function(){
-    if(!loggedIn) {
-	console.log("Init login dialog");
-	var login = new LoginPage();
-	currentPage = login;
-	login.render();
-    } else {
-	Match.init();
-	renderChat();
-	Chat.init();
-	renderSidebar();
-	if(location.hash.length>0) {
-	    if(typeof(pages[location.hash.substring(1).split("-")[0]]) !== "undefined") {
-		gotoPage(location.hash.substring(1).split("-")[0]);
-	    } else {
-		gotoPage("index");
-	    }
-	} else {
-	    gotoPage("index");
-	}
-    }
-});
-
-$(window).hashchange(function(){
-    console.log("Hash change");
-    if(location.hash.length>0) {
-	if(typeof(pages[location.hash.substring(1).split("-")[0]]) !== "undefined") {
-	    gotoPage(location.hash.substring(1).split("-")[0]);
-	} else {
-	    gotoPage("index");
-	}
-    } else {
-	gotoPage("index");
-    }
-});</script>';
 	echo '</head>';
 	echo '<body>';
 	echo '</body>';
