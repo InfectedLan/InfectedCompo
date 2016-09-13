@@ -26,6 +26,7 @@
 	    var compo = datastore["compoList"][i];
 	}
     }
+    //debugger;
     if(typeof(compo) === "undefined") {
 	error("Du prøver å se på clanen til en compo som ikke eksisterer");
 	gotoPage("index");
@@ -150,13 +151,13 @@
 	for(var i = 0; i < clan.playingMembers.length; i++) {
 	    if(clan.playingMembers[i].id == me.id) {
 		var person = clan.playingMembers[i];
-		$("#playingTable").append('<tr><td>' + person.displayName + '</td><td><input class="stepinBtn" type="button" value="Set as stepin" /></td></tr>');
+		$("#playingTable").append('<tr><td>' + person.displayName + (person.hasLinkedSteam&&compo.requiresSteam?"":" (<b title='Brukeren har ikke linket steam'>!</b>)") + '</td><td><input class="stepinBtn" type="button" value="Set as stepin" /></td></tr>');
 		$("#playingTable").find(".stepinBtn").last().on('click', {person: person}, function(data) {
 		    setAsStepinPlayer(data.data.person.id, currentClanId);
 		});
 	    } else {
 		var person = clan.playingMembers[i];
-		$("#playingTable").append('<tr><td>' + person.displayName + '</td><td><input class="stepinBtn" type="button" value="Set as stepin" /></td><td><input class="kickBtn" type="button" value="Kick"/></td></tr>');
+		$("#playingTable").append('<tr><td>' + person.displayName + (person.hasLinkedSteam&&compo.requiresSteam?"":" (<b title='Brukeren har ikke linket steam'>!</b>)") + '</td><td><input class="stepinBtn" type="button" value="Set as stepin" /></td><td><input class="kickBtn" type="button" value="Kick"/></td></tr>');
 		$("#playingTable").find(".stepinBtn").last().on('click', {person: person}, function(data) {
 		    setAsStepinPlayer(data.data.person.id, currentClanId);
 		});

@@ -24,8 +24,8 @@ var login_html = '<div id="loginbox"><script src="../api/scripts/login.js"></scr
 
 var sidebar_html = '<div id="content" style="display:none;"><div id="leftColumn"><div id="profileBox"><div id="userProfilePic"></div><div id="userName"></div><div><a id="editUserLabel" href="javascript:editUser()">Endre profil</a><a id="logOutLabel" href="javascript:logout()">Logg ut</a></div></div><div id="teamBox"><p style="position:absolute; top:-45px;">Teams</p><div id="teamData"><h3>Laster inn...</h3></div><p id="addTeam"><span style="font-size:20px; margin-top:-15px;">+</span> Add Team</p></div><div id="chatBox"><div id="chatContainer"></div></div></div><div id="rightColumn"><div id="banner"></div><div id="mainContent"></div></div></div>';
 
-/*var newTeam_html = '<h1>Lag team</h1><table><tr><td width="50%"><table><tr><td>Teamname:</td><td><input type="text" id="clanName" /></td></tr><tr><td>Teamtag:</td><td><input type="text" id="clanTag" /></td></tr><tr><td>Compo:</td><td><select id="compoSelect"></select></td></tr><tr><td><div id="addClanButtonWrapper"><input id="btnRegisterClan" type="button" value="Lag klan!" /></div></td></tr></table></td><td width="50%">Invite teammates: <input id="inviteSearchBox" type="text" /><br /><div id="searchResultsResultPane"></div><br /><h3>Invited players:</h3><div id="invidedPlayers"></div></td></tr></table>';*/
-var newTeam_html = '<h1>Lag team</h1><i>Registrering er for øyeblikket stengt</i>';
+var newTeam_html = '<h1>Lag team</h1><table><tr><td width="50%"><table><tr><td>Teamname:</td><td><input type="text" id="clanName" /></td></tr><tr><td>Teamtag:</td><td><input type="text" id="clanTag" /></td></tr><tr><td>Compo:</td><td><select id="compoSelect"></select></td></tr><tr><td><div id="addClanButtonWrapper"><input id="btnRegisterClan" type="button" value="Lag klan!" /></div></td></tr></table></td><td width="50%">Invite teammates: <input id="inviteSearchBox" type="text" /><br /><div id="searchResultsResultPane"></div><br /><h3>Invited players:</h3><div id="invidedPlayers"></div></td></tr></table>';
+//var newTeam_html = '<h1>Lag team</h1><i>Registrering er for øyeblikket stengt</i>';
 
 var clan_html = '<h1 id="clanLabel">Clan</h1><br /><h3 id="compoLabel">compo</h3><br /><b id="qualifiedNotification">notification</b><br /><br /><h2>Medlemmer</h2><table id="playingTable"></table><br /><h2>Step-in medlemmer</h2><table id="stepinTable"></table><br /><h2>Inviterte medlemmer</h2><table id="invitedTable"></table>';
 
@@ -104,7 +104,7 @@ ClanPage.prototype.render = function() {
     var userDataTask = new DownloadDatastoreTask("json/user/getUserData.php", "userData", function(data){});
     
     var downloadManager = new PageDownloadWaiter([compoListTask, compoDataTask, userDataTask], function() {
-	$.getScript(api_path + "scripts/clan.js").done(function(script, status) {
+	$.getScript("scripts/clan.js").done(function(script, status) {
 	    $("#mainContent").fadeIn(300);
 	}).fail(function(jqxhr, settings, exception) {
 	    console.log(exception);
@@ -226,7 +226,7 @@ NewTeamPage.prototype.render = function() {
 	for(var i = 0; i < datastore["compoList"].length; i++) {
 	    $("#compoSelect").append($('<option>', {value: datastore["compoList"][i].id, text: datastore["compoList"][i].title}));
 	}
-	$.getScript(api_path + "scripts/addTeam.js").done(function(script, status) {
+	$.getScript("scripts/addTeam.js").done(function(script, status) {
 	    $("#mainContent").fadeIn(300);
 	}).fail(function(jqxhr, settings, exception) {
 	    console.log(exception);
@@ -475,16 +475,32 @@ function renderClanList() {
 	});
 	userDataTask.start(); //Ensure we have user data.
     } else {
-	var clanListTask = new DownloadDatastoreTask("json/compo/getCompoStatus.php", "clanList", function(data){
-	    //Add teams
+	var userDataTask = new DownloadDatastoreTask("json/user/getUserData.php", "userData", function(data){});
+	var clanListTask = new DownloadDatastoreTask("json/compo/getCompoStatus.php", "clanList", function(data){});
+	var downloadWaiterTask = new PageDownloadWaiter([userDataTask, clanListTask], function() {
+	    var data = datastore["clanList"];
 	    $("#teamData").html("");
+	    //Add steam warning
+	    var isInSteamClan = false;
+	    for(var i = 0; i < data.clans.length; i++) {
+		if(data.clans[i].compo.requiresSteamId) {
+		    isInSteamClan = true;
+		}
+	    }
+	    //debugger;
+	    if(isInSteamClan && datastore["userData"].steamId == null) {
+		console.log("Adding steam warning");
+		$("#teamData").append('<div class="teamEntry" style="margin-bottom: 20px;"><h1>Link til steam</h1><p>Du har ikke linket kontoen din til steam. Laget ditt vil ikke være kvalifisert før du gjør dette.</p><a href="' + steamAuthUrl + '"><img src="images/steam_btn.png" /></a></div>');
+	    }
+	    
+	    //Add teams
 	    for(var i = 0; i < data.clans.length; i++) {
 		$("#teamData").append('<div class="teamEntry" id="teamHeaderId' + data.clans[i].id + '"><h1>' + data.clans[i].tag + '</h1><h3> - ' + data.clans[i].compo.tag + '</h3>');
 		$("#teamHeaderId" + data.clans[i].id).click({teamId: data.clans[i].id}, function(e){window.location="index.php#clan-" + e.data.teamId});
 	    }
 	    //Render invites
 	    var acceptInvite = function(inviteId) {
-		$.getJSON('json/invite/acceptInvite.php?id=' + encodeURIComponent(inviteId), function(data){
+		$.getJSON(api_path + 'json/invite/acceptInvite.php?id=' + encodeURIComponent(inviteId), function(data){
 		    if(data.result) {
 			renderClanList();
 		    } else {
@@ -515,7 +531,7 @@ function renderClanList() {
 	    }
 	    $("#addTeam").show();
 	}, false);
-	clanListTask.start();
+	downloadWaiterTask.start();
     }
 }
 

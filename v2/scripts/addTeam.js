@@ -41,11 +41,11 @@
 		    {
 			if( !isInvited(data.users[i].id) )
 			{
+			    console.log("Button for " + data.users[i].id);
 			    var displayName = data.users[i].firstname + ' "' + data.users[i].nickname + '" ' + data.users[i].lastname;
 			    $('#searchResultsResultPane').append("<b>" + displayName + '</b> <input type="button" id="inviteUser' + i + '" value="Legg til"  /><br />');
-			    var user = data.users[i];
-			    $("#inviteUser" + i).on('click', {inviteFunc: inviteUser}, function(event) {
-				event.data.inviteFunc(user.id, user.firstname + ' "' + user.nickname + '" ' + user.lastname);
+			    $("#inviteUser" + i).on('click', {inviteFunc: inviteUser, user: data.users[i]}, function(event) {
+				event.data.inviteFunc(event.data.user.id, event.data.user.firstname + ' "' + event.data.user.nickname + '" ' + event.data.user.lastname);
 			    });
 			}
 		    }
