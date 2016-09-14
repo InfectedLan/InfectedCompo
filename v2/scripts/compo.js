@@ -27,7 +27,7 @@ var sidebar_html = '<div id="content" style="display:none;"><div id="leftColumn"
 var newTeam_html = '<h1>Lag team</h1><table><tr><td width="50%"><table><tr><td>Teamname:</td><td><input type="text" id="clanName" /></td></tr><tr><td>Teamtag:</td><td><input type="text" id="clanTag" /></td></tr><tr><td>Compo:</td><td><select id="compoSelect"></select></td></tr><tr><td><div id="addClanButtonWrapper"><input id="btnRegisterClan" type="button" value="Lag klan!" /></div></td></tr></table></td><td width="50%">Invite teammates: <input id="inviteSearchBox" type="text" /><br /><div id="searchResultsResultPane"></div><br /><h3>Invited players:</h3><div id="invidedPlayers"></div></td></tr></table>';
 //var newTeam_html = '<h1>Lag team</h1><i>Registrering er for øyeblikket stengt</i>';
 
-var clan_html = '<h1 id="clanLabel">Clan</h1><br /><h3 id="compoLabel">compo</h3><br /><b id="qualifiedNotification">notification</b><br /><br /><h2>Medlemmer</h2><table id="playingTable"></table><br /><h2>Step-in medlemmer</h2><table id="stepinTable"></table><br /><h2>Inviterte medlemmer</h2><table id="invitedTable"></table>';
+var clan_html = '<h1 id="clanLabel">Clan</h1><br /><h3 id="compoLabel">compo</h3><br /><b id="qualifiedNotification"></b><br /><br /><h2>Medlemmer</h2><table id="playingTable"></table><br /><h2>Step-in medlemmer</h2><table id="stepinTable"></table><br /><h2>Inviterte medlemmer</h2><table id="invitedTable"></table>';
 
 /******************************************************
  * Page master class

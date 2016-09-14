@@ -43,7 +43,8 @@ class Site {
 		    //Qualify any clan that waited for this user
 		    $clans = ClanHandler::getClansByUser($user);
 		    foreach($clans as $clan) {
-			if(ClanHandler::isQualified($clan, $clan->getCompo()))
+			$compo = $clan->getCompo();
+			if(ClanHandler::isQualified($clan, $compo))
 			    continue;
 			$playingMembers = ClanHandler::getPlayingClanMembers($clan);
 			$fullTeam = true;
@@ -53,8 +54,7 @@ class Site {
 				break;
 			    }
 			}
-			if($fullTeam) {
-			    $compo = $clan->getCompo();
+			if($fullTeam && count($playingMembers) == $compo->getTeamSize()) {
 			    $playingClans = ClanHandler::getQualifiedClansByCompo($compo);
 			    if(count($playingClans) < $compo->getParticipantLimit() || $compo->getParticipantLimit() == 0) {
 				ClanHandler::setQualified($clan, true);
@@ -106,7 +106,10 @@ class Site {
 	    $openid->identity = 'https://steamcommunity.com/openid';
 	    echo '<script>var steamAuthUrl = "' . $openid->authUrl() . '";</script>';*/
 	    //Steam blocks us for "discovering" steamcommunity.com/openid too often, so use static url.
-	    $steamAuthUrl = "https://steamcommunity.com/openid/login?openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.mode=checkid_setup&openid.return_to=http%3A%2F%2Flocalhost%2Fcompo%2Fv2%2Findex.php&openid.realm=http%3A%2F%2Flocalhost&openid.ns.sreg=http%3A%2F%2Fopenid.net%2Fextensions%2Fsreg%2F1.1&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select";
+	    $realm = urlencode('https://' . $_SERVER['HTTP_HOST']);
+	    $returnTo = urlencode('https://' . $_SERVER['HTTP_HOST'] . "/v2/index.php");
+	    //$steamAuthUrl = "https://steamcommunity.com/openid/login?openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.mode=checkid_setup&openid.return_to=http%3A%2F%2Flocalhost%2Fcompo%2Fv2%2Findex.php&openid.realm=http%3A%2F%2Flocalhost&openid.ns.sreg=http%3A%2F%2Fopenid.net%2Fextensions%2Fsreg%2F1.1&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select";
+	    $steamAuthUrl = "https://steamcommunity.com/openid/login?openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.mode=checkid_setup&openid.return_to=" . $returnTo . "&openid.realm=" . $realm . "&openid.ns.sreg=http%3A%2F%2Fopenid.net%2Fextensions%2Fsreg%2F1.1&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select";
 	    echo '<script>var steamAuthUrl = "' . $steamAuthUrl . '";</script>';
 	}
 	echo "<script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create', 'UA-54254513-4', 'auto');ga('send', 'pageview');</script>";
