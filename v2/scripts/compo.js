@@ -22,7 +22,7 @@
 
 var login_html = '<div id="loginbox"><script src="../api/scripts/login.js"></script><form class="login" method="post"><ul><li><input class="input" type="text" name="identifier" placeholder="Brukernavn, E-post eller Telefon"></li><li><input class="input" name="password" type="password" placeholder="Passord"></li><li><input class="button" id="submit" name="submit" type="submit" value="Logg inn"></li></ul></form><br /><i>Du bruker samme bruker på composiden og ticketsiden</i></div>';
 
-var sidebar_html = '<div id="content" style="display:none;"><div id="leftColumn"><div id="profileBox"><div id="userProfilePic"></div><div id="userName"></div><div><a id="editUserLabel" href="javascript:editUser()">Endre profil</a><a id="logOutLabel" href="javascript:logout()">Logg ut</a></div></div><div id="teamBox"><p style="position:absolute; top:-45px;">Teams</p><div id="teamData"><h3>Laster inn...</h3></div><p id="addTeam"><span style="font-size:20px; margin-top:-15px;">+</span> Add Team</p></div><div id="chatBox"><div id="chatContainer"></div></div></div><div id="rightColumn"><div id="banner"></div><div id="mainContent"></div></div></div>';
+var sidebar_html = '<div id="content" style="display:none;"><div id="leftColumn"><div id="profileBox"><div id="userProfilePic"></div><div id="userName"></div><div><a id="editUserLabel" href="javascript:editUser()">Endre profil</a><a id="logOutLabel" href="javascript:logout()">Logg ut</a></div></div><div id="teamBox"><p style="position:absolute; top:-45px;">Teams</p><div id="teamData"><h3>Laster inn...</h3></div><div class="addTeamContainer"><p id="addTeam"><span style="font-size:20px; margin-top:-15px;">+</span> Add Team</p></div></div><div id="chatBox"><div id="chatContainer"></div></div></div><div id="rightColumn"><div id="banner"></div><div id="mainContent"></div></div></div>';
 
 var newTeam_html = '<h1>Lag team</h1><table><tr><td width="50%"><table><tr><td>Teamname:</td><td><input type="text" id="clanName" /></td></tr><tr><td>Teamtag:</td><td><input type="text" id="clanTag" /></td></tr><tr><td>Compo:</td><td><select id="compoSelect"></select></td></tr><tr><td><div id="addClanButtonWrapper"><input id="btnRegisterClan" type="button" value="Lag klan!" /></div></td></tr></table></td><td width="50%">Invite teammates: <input id="inviteSearchBox" type="text" /><br /><div id="searchResultsResultPane"></div><br /><h3>Invited players:</h3><div id="invidedPlayers"></div></td></tr></table>';
 //var newTeam_html = '<h1>Lag team</h1><i>Registrering er for øyeblikket stengt</i>';
@@ -472,11 +472,11 @@ function renderClanList() {
 		$("#teamData").html("<center><h1>Gamet ditt er klart!</h1> Vennligst gå <a href='index.php#currentMatch'>hit</a> for å starte</center>");
 		$("#addTeam").remove();
 	    }
-	});
+	}, false);
 	userDataTask.start(); //Ensure we have user data.
     } else {
 	var userDataTask = new DownloadDatastoreTask("json/user/getUserData.php", "userData", function(data){});
-	var clanListTask = new DownloadDatastoreTask("json/compo/getCompoStatus.php", "clanList", function(data){});
+	var clanListTask = new DownloadDatastoreTask("json/compo/getCompoStatus.php", "clanList", function(data){}, false);
 	var downloadWaiterTask = new PageDownloadWaiter([userDataTask, clanListTask], function() {
 	    var data = datastore["clanList"];
 	    $("#teamData").html("");
@@ -488,7 +488,8 @@ function renderClanList() {
 		}
 	    }
 	    //debugger;
-	    if(isInSteamClan && datastore["userData"].steamId == null) {
+	    if(isInSteamClan && datastore["userData"].steamId === null) {
+		//debugger;
 		console.log("Adding steam warning");
 		$("#teamData").append('<div class="teamEntry" style="margin-bottom: 20px;"><h1>Link til steam</h1><p>Du har ikke linket kontoen din til steam. Laget ditt vil ikke være kvalifisert før du gjør dette.</p><a href="' + steamAuthUrl + '"><img src="images/steam_btn.png" /></a></div>');
 	    }

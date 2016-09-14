@@ -227,10 +227,13 @@ a {
 			clear:both;
 			font-weight:lighter;
 		}
-
+		.addTeamContainer {
+		    
+		}
 		#addTeam{
-			position:absolute;
-			right:10px;
+		    /*position:absolute;*/
+		    /*right:10px;*/
+		    float: right;
 			padding:0px 5px 5px;
 			bottom:-10px;
 			-webkit-user-select: none; /* Chrome/Safari */

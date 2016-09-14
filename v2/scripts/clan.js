@@ -55,10 +55,24 @@
 	$("#qualifiedNotification").html('Laget er kvalifisert til å spille i konkurransen');
     } else {
 	if(isInClan) {
+	    var isAllSteamAuthenticated = !compo.requiresSteam;
+	    if(!isAllSteamAuthenticated) {
+		isAllSteamAuthenticated = true;
+		for(var i = 0; i < clan.playingMembers.length; i++) {
+		    if(!clan.playingMembers[i].hasLinkedSteam) {
+			isAllSteamAuthenticated = false;
+			break;
+		    }
+		}
+	    }
+	    
+	    if(!isAllSteamAuthenticated) {
+		$("#qualifiedNotification").html('ADVARSEL: Alle spillende medlemmer på laget må koble til steam for at laget skal bli kvalifisert for denne konkurransen.<br />');
+	    }
 	    if(clan.playingMembers.length != compo.teamSize) {
-		$("#qualifiedNotification").html('ADVARSEL: Dere er ikke kvalifisert, fordi dere ikke har fylt opp alle plassene. Påmeldingen er ikke ferdig før alle spillere har akseptert invitasjonene sine.');
-	    } else {
-		$("#qualifiedNotification").html('Beklager, laget er ikke kvalifisert, fordi dere var for sene med å fylle laget. Det kan hende dere kan bli etter-kvalifisert dersom et spillende lag må melde seg av.');
+		$("#qualifiedNotification").append('ADVARSEL: Dere er ikke kvalifisert, fordi dere ikke har fylt opp alle plassene. Påmeldingen er ikke ferdig før alle spillere har akseptert invitasjonene sine.');
+	    } else if(isAllSteamAuthenticated) {
+		$("#qualifiedNotification").append('Beklager, laget er ikke kvalifisert, fordi dere var for sene med å fylle laget. Det kan hende dere kan bli etter-kvalifisert dersom et spillende lag må melde seg av.');
 	    }		
 	} else {
 	    $("#qualifiedNotification").html('Laget er ikke kvalifisert');
