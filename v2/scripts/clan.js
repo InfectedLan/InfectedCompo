@@ -32,8 +32,29 @@
 	gotoPage("index");
 	return;
     }
+    
     $("#clanLabel").html(clan.name + " - " + clan.tag);
     $("#compoLabel").html(compo.title);
+    if(clan.chief==me.id) {
+	$("#adminButtons").html('<h2>Chief-muligheter</h2><input type="button" id="renameClanBtn" value="Endre navn/tag" /><input type="button" id="deleteClanBtn" value="Slett clan" />');
+	$("#deleteClanBtn").on('click', {clanId: currentClanId}, function(data) {
+	    if(confirm('Er du sikker på at du vil slette clanen? Når den er slettet, kan du ikke angre!')) {
+		$.getJSON('../api/json/compo/deleteClan.php' + '?id=' + encodeURIComponent(data.data.clanId), function(data) {
+		    if (data.result) {
+			location.reload();
+		    } else {
+			error(data.message);
+		    }
+		});
+	    }
+	});
+	$("#renameClanBtn").on('click', {clanId: currentClanId}, function(data) {
+	    $("#titleContainer").fadeOut(100, function() {
+		$("#titleContainer").html('<input type="text" id="clanNameTxt" placeholder="Klan-navn" /> - <input type="text" id="clanTagTxt" placeholder="Klan-tag" /><input type="button" id="renameClanActionBtn" value="Endre" />');
+		$("#titleContainer").fadeIn(100);
+	    });
+	});
+    }
 
     //Check if we are in the clan
     var isInClan = (function() {
