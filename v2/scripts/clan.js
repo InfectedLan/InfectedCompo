@@ -39,9 +39,9 @@
 	$("#adminButtons").html('<h2>Chief-muligheter</h2><input type="button" id="renameClanBtn" value="Endre navn/tag" /><input type="button" id="deleteClanBtn" value="Slett clan" />');
 	$("#deleteClanBtn").on('click', {clanId: currentClanId}, function(data) {
 	    if(confirm('Er du sikker på at du vil slette clanen? Når den er slettet, kan du ikke angre!')) {
-		$.getJSON('../api/json/compo/deleteClan.php' + '?id=' + encodeURIComponent(data.data.clanId), function(data) {
+		$.getJSON('../api/json/clan/removeClan.php' + '?id=' + encodeURIComponent(data.data.clanId), function(data) {
 		    if (data.result) {
-			location.reload();
+			gotoPage("index");
 		    } else {
 			error(data.message);
 		    }
@@ -49,9 +49,22 @@
 	    }
 	});
 	$("#renameClanBtn").on('click', {clanId: currentClanId}, function(data) {
-	    $("#titleContainer").fadeOut(100, function() {
-		$("#titleContainer").html('<input type="text" id="clanNameTxt" placeholder="Klan-navn" /> - <input type="text" id="clanTagTxt" placeholder="Klan-tag" /><input type="button" id="renameClanActionBtn" value="Endre" />');
-		$("#titleContainer").fadeIn(100);
+	    $("#titleContainer").fadeOut(200, function() {
+		$("#titleContainer").html('<form id="clanNameForm"><input type="text" name="name" placeholder="Klan-navn" /> - <input type="text" name="tag" placeholder="Klan-tag" /></form><input type="button" id="renameClanActionBtn" value="Endre" />');
+		$("#titleContainer").fadeIn(200);
+		$("#renameClanActionBtn").on('click', {}, function(data) {
+		    //alert($("#clanNameForm").serialize());
+		    $.getJSON('../api/json/clan/editClan.php' + '?' + $("#clanNameForm").serialize() + '&id=' + currentClanId, function(data) {
+			if (data.result) {
+			    location.reload();
+			    $("#titleContainer").fadeIn(200);
+			} else {
+			    error(data.message);
+			    $("#titleContainer").fadeIn(200);
+			}
+		    });
+		    $("#titleContainer").fadeOut(100, function() {});
+		});
 	    });
 	});
     }
