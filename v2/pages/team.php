@@ -70,12 +70,12 @@ if (isset($_GET['id']) &&
         echo '<tr>';
       	if ($user == $team->getChief()) { //Are we a chief?
             if ($member->getId() != $team->getChief()) { //Only show kick button if this isnt us
-                echo '<td>' . $member->getCompoDisplayName() . '</td><td><input type="button" value="Set as stepin" onclick="setAsStepinPlayer(' . $member->getId() . ', ' . $team->getId() . ')" /></td><td><input type="button" value="Kick" onclick="kickUser(' . $member->getId() . ', ' . $team->getId() . ')" /></td>';
+                echo '<td>' . $member->getDisplayName() . '</td><td><input type="button" value="Set as stepin" onclick="setAsStepinPlayer(' . $member->getId() . ', ' . $team->getId() . ')" /></td><td><input type="button" value="Kick" onclick="kickUser(' . $member->getId() . ', ' . $team->getId() . ')" /></td>';
             } else {
-                echo '<td>' . $member->getCompoDisplayName() . '</td><td><input type="button" value="Set as stepin" onclick="setAsStepinPlayer(' . $member->getId() . ', ' . $team->getId() . ')" /></td>';
+                echo '<td>' . $member->getDisplayName() . '</td><td><input type="button" value="Set as stepin" onclick="setAsStepinPlayer(' . $member->getId() . ', ' . $team->getId() . ')" /></td>';
             }
         } else {
-            echo '<td>' . $member->getCompoDisplayName() . '</td>';
+            echo '<td>' . $member->getDisplayName() . '</td>';
         }
         echo '</tr>';
     }
@@ -92,12 +92,12 @@ if (isset($_GET['id']) &&
             echo '<tr>';
             if ($user == $team->getChief()) { //Are we a chief?
                 if ($member->getId() != $team->getChief()) { //Only show kick button if this isnt us
-                    echo '<td>' . $member->getCompoDisplayName() . '</td><td><input type="button" value="Set as primary player" onclick="setAsPrimaryPlayer(' . $member->getId() . ', ' . $team->getId() . ')" /></td><td><input type="button" value="Kick" onclick="kickUser(' . $member->getId() . ', ' . $team->getId() . ')" /></td>';
+                    echo '<td>' . $member->getDisplayName() . '</td><td><input type="button" value="Set as primary player" onclick="setAsPrimaryPlayer(' . $member->getId() . ', ' . $team->getId() . ')" /></td><td><input type="button" value="Kick" onclick="kickUser(' . $member->getId() . ', ' . $team->getId() . ')" /></td>';
                 } else {
-                    echo '<td>' . $member->getCompoDisplayName() . '</td><td><input type="button" value="Set as primary player" onclick="setAsPrimaryPlayer(' . $member->getId() . ', ' . $team->getId() . ')" /></td>';
+                    echo '<td>' . $member->getDisplayName() . '</td><td><input type="button" value="Set as primary player" onclick="setAsPrimaryPlayer(' . $member->getId() . ', ' . $team->getId() . ')" /></td>';
                 }
             } else {
-                echo '<td>' . $member->getCompoDisplayName() . '</td>';
+                echo '<td>' . $member->getDisplayName() . '</td>';
             }
             echo '</tr>';
         }
@@ -116,9 +116,9 @@ if (isset($_GET['id']) &&
         echo '<td>';
 
         if ($team->getChief() == $user) {
-            echo UserHandler::getUser($invite->getUser()->getId())->getCompoDisplayName() . '<input type="button" value="Slett invite" onClick="deleteInvite(' . $invite->getId() . ')" />';
+            echo UserHandler::getUser($invite->getUser()->getId())->getDisplayName() . '<input type="button" value="Slett invite" onClick="deleteInvite(' . $invite->getId() . ')" />';
         } else {
-            echo UserHandler::getUser($invite->getUser()->getId())->getCompoDisplayName();
+            echo UserHandler::getUser($invite->getUser()->getId())->getDisplayName();
         }
 
         echo '</td>';
