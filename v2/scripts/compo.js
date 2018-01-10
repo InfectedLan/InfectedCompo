@@ -444,7 +444,7 @@ function renderSidebar() {
     $("body").html(sidebar_html);
     var userDataTask = new DownloadDatastoreTask("json/user/getUserData.php", "userData", function(data){
 	console.log("Got user data: " + data);
-	$("#userProfilePic").html('<img src="' + data.avatar.thumb + '" />');
+	$("#userProfilePic").html('<img src="../api/' + data.avatar.thumb + '" />');
 	$("#userName").html('<p>' + data.displayName + '</p>');
 	$("#content").fadeIn(300);
     });
